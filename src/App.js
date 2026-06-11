@@ -211,12 +211,25 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
   }
 }
 
+// Convierte email a clave Firestore reemplazando SOLO los puntos del usuario (no del dominio)
+// ej: Saldivar.nunez@gmail.com → saldivar_nunez@gmail_com (Firestore no permite puntos ni @)
+// Usamos una clave que sea consistente: todo minúsculas, @ → _AT_, . → _
+function emailToKey(email) {
+  return email.toLowerCase().replace(/@/g, "_AT_").replace(/\./g, "_");
+}
+
 async function recalcularTodosUsuarios(resultadosActuales, setTodosPronosticos) {
   const usuarios = await fbGetAll("usuarios");
   const todosRanking = {};
-  for (const [email, u] of Object.entries(usuarios)) {
-    const emailKey = email.replace(/\./g, "_");
-    const sus = await fbGet("pronosticos", emailKey) || {};
+  const emailsVistos = new Set();
+
+  for (const [, u] of Object.entries(usuarios)) {
+    const emailLower = (u.email || "").toLowerCase();
+    if (emailsVistos.has(emailLower)) continue;
+    emailsVistos.add(emailLower);
+
+    const key = emailToKey(emailLower);
+    const sus = await fbGet("pronosticos", key) || {};
     let total = 0, exactos = 0;
     for (const [pid, pro] of Object.entries(sus)) {
       if (resultadosActuales[pid]) {
@@ -225,7 +238,7 @@ async function recalcularTodosUsuarios(resultadosActuales, setTodosPronosticos) 
         if (pts === 2) exactos++;
       }
     }
-    todosRanking[email] = { nombre: u.nombre, total, exactos };
+    todosRanking[emailLower] = { nombre: u.nombre, total, exactos };
   }
   await fbSet("global", "ranking", todosRanking);
   if (setTodosPronosticos) setTodosPronosticos({ ...todosRanking });
@@ -291,14 +304,14 @@ function LoginView({ onLogin }) {
       if (!nombre.trim()) { setError("Ingresa tu nombre"); setLoading(false); return; }
       if (!pass.trim() || pass.length < 4) { setError("Contraseña mínimo 4 caracteres"); setLoading(false); return; }
       if (codigo.trim().toLowerCase() !== INVITE_CODE.toLowerCase()) { setError("Código de invitación incorrecto"); setLoading(false); return; }
-      const emailKey = email.toLowerCase().replace(/\./g, "_");
+      const emailKey = emailToKey(email);
       const existe = await fbGet("usuarios", emailKey);
       if (existe) { setError("Ya existe una cuenta con ese email"); setLoading(false); return; }
       const nuevoUsuario = { nombre, email: email.toLowerCase(), pass, creado: Date.now() };
       await fbSet("usuarios", emailKey, nuevoUsuario);
       onLogin(nuevoUsuario);
     } else {
-      const emailKey = email.toLowerCase().replace(/\./g, "_");
+      const emailKey = emailToKey(email);
       const u = await fbGet("usuarios", emailKey);
       if (!u) { setError("No existe cuenta con ese email"); setLoading(false); return; }
       if (u.pass !== pass) { setError("Contraseña incorrecta"); setLoading(false); return; }
@@ -380,10 +393,11 @@ function CardPartido({ p, resultados, misPronosticos, pronosticoLocal, setPronos
   const horaLocal = inicio.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
 
   async function guardar() {
-    const pro = pronosticoLocal[p.id];
-    if (!pro || pro.localGoles === "" || pro.visitanteGoles === "") return;
+    const pro = pronosticoLocal[p.id] || {};
+    const localGoles = parseInt(pro.localGoles) || 0;
+    const visitanteGoles = parseInt(pro.visitanteGoles) || 0;
     setGuardando(true);
-    await onGuardar(p.id, { localGoles: parseInt(pro.localGoles), visitanteGoles: parseInt(pro.visitanteGoles) });
+    await onGuardar(p.id, { localGoles, visitanteGoles });
     setGuardando(false);
     setEditando(false);
   }
@@ -735,8 +749,60 @@ function AdminView({ resultados, onGuardarResultado }) {
   );
 }
 
-// ─── APP PRINCIPAL ────────────────────────────────────────────────────────
-const ADMIN_EMAIL = "saldivar.nunez@gmail.com";
+// ─── LIMPIEZA: NaN → 0, deduplicar emails y migrar claves antiguas ──────────
+async function limpiarNaNyDuplicados() {
+  try {
+    const usuarios = await fbGetAll("usuarios");
+    const todosPronosticos = await fbGetAll("pronosticos");
+    const resultados = await fbGet("global", "resultados") || {};
+
+    // Paso 1: Para cada usuario, consolidar todos sus pronósticos bajo la clave correcta
+    const emailsVistos = new Set();
+    for (const [, u] of Object.entries(usuarios)) {
+      const emailLower = (u.email || "").toLowerCase();
+      if (emailsVistos.has(emailLower)) continue;
+      emailsVistos.add(emailLower);
+
+      const keyCorrecta = emailToKey(emailLower);
+
+      // Buscar pronósticos bajo variantes antiguas de clave
+      // Variante 1: solo puntos reemplazados (sin @) → "saldivar_nunez@gmail_com"
+      const keyVieja1 = emailLower.replace(/\./g, "_");
+      // Variante 2: con mayúsculas original → "Saldivar_nunez@gmail_com"
+      const keyVieja2 = (u.email || "").replace(/\./g, "_");
+
+      const proCorrecta = todosPronosticos[keyCorrecta] || {};
+      const proVieja1 = todosPronosticos[keyVieja1] || {};
+      const proVieja2 = todosPronosticos[keyVieja2] || {};
+
+      // Merge: la clave correcta tiene prioridad, luego vieja1, vieja2
+      const merged = { ...proVieja2, ...proVieja1, ...proCorrecta };
+
+      // Paso 2: Limpiar NaN en los pronósticos mergeados
+      const limpios = {};
+      for (const [pid, pro] of Object.entries(merged)) {
+        limpios[pid] = {
+          localGoles: isNaN(parseInt(pro.localGoles)) ? 0 : parseInt(pro.localGoles),
+          visitanteGoles: isNaN(parseInt(pro.visitanteGoles)) ? 0 : parseInt(pro.visitanteGoles),
+        };
+      }
+
+      // Guardar bajo la clave correcta
+      if (Object.keys(limpios).length > 0) {
+        await fbSet("pronosticos", keyCorrecta, limpios);
+      }
+
+      // Asegurar que el usuario quede guardado con email en minúsculas
+      await fbSet("usuarios", keyCorrecta, { ...u, email: emailLower });
+    }
+
+    // Paso 3: Recalcular ranking limpio
+    await recalcularTodosUsuarios(resultados, null);
+
+  } catch(e) {
+    console.warn("Error en limpieza:", e);
+  }
+}
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -754,6 +820,9 @@ export default function App() {
       const ranking = await fbGet("global", "ranking") || {};
       setTodosPronosticos(ranking);
       setLoading(false);
+      // Limpieza de NaN y duplicados (se ejecuta una vez al cargar)
+      await limpiarNaNyDuplicados();
+      // Sincronizar resultados con API
       sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
     }
     init();
@@ -766,7 +835,7 @@ export default function App() {
   useEffect(() => {
     if (!usuario) return;
     async function cargarMis() {
-      const emailKey = usuario.email.replace(/\./g, "_");
+      const emailKey = emailToKey(usuario.email);
       const mis = await fbGet("pronosticos", emailKey) || {};
       setMisPronosticos(mis);
     }
@@ -784,7 +853,7 @@ export default function App() {
         if (pts === 2) exactos++;
       }
     }
-    ranking[email] = { nombre: usuario.nombre, total, exactos };
+    ranking[email.toLowerCase()] = { nombre: usuario.nombre, total, exactos };
     await fbSet("global", "ranking", ranking);
     setTodosPronosticos({ ...ranking });
   }, [usuario]);
@@ -792,7 +861,7 @@ export default function App() {
   async function guardarPronostico(partidoId, goles) {
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
-    const emailKey = usuario.email.replace(/\./g, "_");
+    const emailKey = emailToKey(usuario.email);
     await fbSet("pronosticos", emailKey, nuevos);
     await recalcularTodos(nuevos, usuario.email);
   }
