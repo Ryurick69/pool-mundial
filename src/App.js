@@ -419,7 +419,33 @@ function CardPartido({ p, resultados, misPronosticos, pronosticoLocal, setPronos
           <p className="text-sm font-bold text-white">{p.visitante} {flag(p.visitante)}</p>
         </div>
       </div>
-      {puede ? (
+      {/* Sección pronóstico */}
+      {resultado && proGuardado ? (() => {
+        // Partido finalizado CON pronóstico — mostrar comparación visual
+        const acertoResultado = Math.sign(resultado.localGoles - resultado.visitanteGoles) === Math.sign(proGuardado.localGoles - proGuardado.visitanteGoles);
+        const acertoExacto = resultado.localGoles === proGuardado.localGoles && resultado.visitanteGoles === proGuardado.visitanteGoles;
+        const colorLocal = acertoExacto ? "text-green-400" : acertoResultado ? "text-green-400" : "text-red-400";
+        const colorVisitante = acertoExacto ? "text-green-400" : acertoResultado ? "text-green-400" : "text-red-400";
+        const bgPro = acertoExacto ? "bg-green-500/15 border border-green-500/30" : acertoResultado ? "bg-green-500/10 border border-green-500/20" : "bg-red-500/10 border border-red-500/20";
+        return (
+          <div className={`rounded-xl px-3 py-2 ${bgPro}`}>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <span className="text-xs text-gray-400">Tu pronóstico:</span>
+              <span className={`font-black text-lg ${colorLocal}`}>{proGuardado.localGoles}</span>
+              <span className="text-gray-500">–</span>
+              <span className={`font-black text-lg ${colorVisitante}`}>{proGuardado.visitanteGoles}</span>
+              {acertoExacto
+                ? <span className="text-xs text-green-400 font-bold ml-1">✓ Exacto</span>
+                : acertoResultado
+                  ? <span className="text-xs text-green-400 font-bold ml-1">✓ Ganador</span>
+                  : <span className="text-xs text-red-400 font-bold ml-1">✗ Fallaste</span>
+              }
+            </div>
+          </div>
+        );
+      })() : resultado && !proGuardado ? (
+        <p className="text-center text-xs text-gray-600 italic">No ingresaste pronóstico para este partido</p>
+      ) : puede ? (
         proGuardado && !editando ? (
           <div className="flex items-center justify-center gap-3 bg-white/5 rounded-xl py-2 px-3">
             <span className="text-xs text-gray-500">Tu pronóstico:</span>
