@@ -804,6 +804,9 @@ async function limpiarNaNyDuplicados() {
   }
 }
 
+// ─── APP PRINCIPAL ────────────────────────────────────────────────────────
+const ADMIN_EMAIL = "saldivar.nunez@gmail.com";
+
 export default function App() {
   const [usuario, setUsuario] = useState(null);
   const [tab, setTab] = useState("hoy");
