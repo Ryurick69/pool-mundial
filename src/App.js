@@ -147,19 +147,37 @@ const FOOTBALL_API_KEY = "f574ec14b771457e88f7e67d02d99ad7";
 const WC_COMPETITION_ID = "WC";
 
 const TEAM_MAP = {
-  "Mexico": "México", "South Africa": "Sudáfrica", "Korea Republic": "Corea del Sur", "Czech Republic": "Chequia",
-  "Canada": "Canadá", "Bosnia and Herzegovina": "Bosnia", "Qatar": "Qatar", "Switzerland": "Suiza",
+  // Grupo A
+  "Mexico": "México", "South Africa": "Sudáfrica",
+  "South Korea": "Corea del Sur", "Korea Republic": "Corea del Sur", "Czechia": "Chequia",
+  // Grupo B
+  "Canada": "Canadá", "Bosnia-Herzegovina": "Bosnia", "Bosnia and Herzegovina": "Bosnia",
+  "Qatar": "Qatar", "Switzerland": "Suiza",
+  // Grupo C
   "Brazil": "Brasil", "Morocco": "Marruecos", "Haiti": "Haití", "Scotland": "Escocia",
-  "USA": "Estados Unidos", "United States": "Estados Unidos", "Paraguay": "Paraguay",
-  "Australia": "Australia", "Türkiye": "Turquía", "Turkey": "Turquía",
-  "Germany": "Alemania", "Curaçao": "Curazao", "Cote d'Ivoire": "Costa de Marfil",
+  // Grupo D
+  "United States": "Estados Unidos", "USA": "Estados Unidos", "Paraguay": "Paraguay",
+  "Australia": "Australia", "Turkey": "Turquía", "Türkiye": "Turquía",
+  // Grupo E
+  "Germany": "Alemania", "Curaçao": "Curazao", "Curacao": "Curazao",
+  "Côte d'Ivoire": "Costa de Marfil", "Cote d'Ivoire": "Costa de Marfil",
   "Ivory Coast": "Costa de Marfil", "Ecuador": "Ecuador",
+  // Grupo F
   "Netherlands": "Países Bajos", "Japan": "Japón", "Sweden": "Suecia", "Tunisia": "Túnez",
-  "Belgium": "Bélgica", "Egypt": "Egipto", "Iran": "Irán", "New Zealand": "Nueva Zelanda",
-  "Spain": "España", "Cape Verde": "Cabo Verde", "Saudi Arabia": "Arabia Saudita", "Uruguay": "Uruguay",
+  // Grupo G
+  "Belgium": "Bélgica", "Egypt": "Egipto", "Iran": "Irán",
+  "New Zealand": "Nueva Zelanda",
+  // Grupo H
+  "Spain": "España", "Cape Verde": "Cabo Verde",
+  "Saudi Arabia": "Arabia Saudita", "Uruguay": "Uruguay",
+  // Grupo I
   "France": "Francia", "Senegal": "Senegal", "Iraq": "Irak", "Norway": "Noruega",
+  // Grupo J
   "Argentina": "Argentina", "Algeria": "Argelia", "Austria": "Austria", "Jordan": "Jordania",
-  "Portugal": "Portugal", "DR Congo": "Congo DR", "Uzbekistan": "Uzbekistán", "Colombia": "Colombia",
+  // Grupo K
+  "Portugal": "Portugal", "DR Congo": "Congo DR", "Congo DR": "Congo DR",
+  "Uzbekistan": "Uzbekistán", "Colombia": "Colombia",
+  // Grupo L
   "England": "Inglaterra", "Croatia": "Croacia", "Ghana": "Ghana", "Panama": "Panamá",
 };
 
@@ -187,14 +205,19 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
     let huboCambios = false;
 
     for (const m of partidosFinalizados) {
+      // Intentar con name primero, luego shortName
       const homeEn = m.homeTeam?.name || m.homeTeam?.shortName;
       const awayEn = m.awayTeam?.name || m.awayTeam?.shortName;
       const golesHome = m.score?.fullTime?.home;
       const golesAway = m.score?.fullTime?.away;
       if (!homeEn || !awayEn || golesHome === null || golesHome === undefined) continue;
+
       const match = encontrarPartidoId(homeEn, awayEn);
-      if (!match) continue;
-      if (resultadosActuales[match.id]) continue;
+      if (!match) {
+        console.warn("No se encontró partido para:", homeEn, "vs", awayEn);
+        continue;
+      }
+      // Siempre actualizar con el resultado oficial de la API (sobreescribe manuales)
       resultadosActuales[match.id] = match.invertido
         ? { localGoles: golesAway, visitanteGoles: golesHome }
         : { localGoles: golesHome, visitanteGoles: golesAway };
