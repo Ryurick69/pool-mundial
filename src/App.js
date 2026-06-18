@@ -143,8 +143,7 @@ const PARTIDOS_BASE = [
 ];
 
 // ─── API FOOTBALL-DATA.ORG ────────────────────────────────────────────────
-const FOOTBALL_API_KEY = "f574ec14b771457e88f7e67d02d99ad7";
-const WC_COMPETITION_ID = "WC";
+
 
 const TEAM_MAP = {
   // Grupo A
