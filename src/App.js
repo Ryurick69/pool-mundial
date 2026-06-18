@@ -69,77 +69,77 @@ const FLAG_EMOJI = {
 
 const PARTIDOS_BASE = [
   { id: "A1", grupo: "A", local: "México",        visitante: "Sudáfrica",     fecha: "2026-06-11T19:00:00Z", sede: "Estadio Azteca, Ciudad de México" },
-  { id: "A2", grupo: "A", local: "Corea del Sur", visitante: "Chequia",       fecha: "2026-06-12T02:00:00Z", sede: "Estadio Guadalajara, Zapopan" },
-  { id: "A3", grupo: "A", local: "Chequia",        visitante: "Sudáfrica",    fecha: "2026-06-18T16:00:00Z", sede: "Atlanta Stadium, Atlanta" },
-  { id: "A4", grupo: "A", local: "México",         visitante: "Corea del Sur",fecha: "2026-06-19T01:00:00Z", sede: "Estadio Guadalajara, Zapopan" },
-  { id: "A5", grupo: "A", local: "Chequia",        visitante: "México",       fecha: "2026-06-25T01:00:00Z", sede: "Estadio Azteca, Ciudad de México" },
-  { id: "A6", grupo: "A", local: "Sudáfrica",      visitante: "Corea del Sur",fecha: "2026-06-25T01:00:00Z", sede: "Estadio Monterrey, Guadalupe" },
-  { id: "B1", grupo: "B", local: "Canadá",  visitante: "Bosnia",  fecha: "2026-06-12T19:00:00Z", sede: "Toronto Stadium, Toronto" },
-  { id: "B2", grupo: "B", local: "Qatar",   visitante: "Suiza",   fecha: "2026-06-13T19:00:00Z", sede: "San Francisco Bay Area Stadium" },
-  { id: "B3", grupo: "B", local: "Suiza",   visitante: "Bosnia",  fecha: "2026-06-18T19:00:00Z", sede: "Los Angeles Stadium, LA" },
-  { id: "B4", grupo: "B", local: "Canadá",  visitante: "Qatar",   fecha: "2026-06-19T22:00:00Z", sede: "BC Place, Vancouver" },
+  { id: "A2", grupo: "A", local: "Corea del Sur", visitante: "Chequia",       fecha: "2026-06-12T02:00:00Z", sede: "Estadio Akron, Guadalajara" },
+  { id: "A3", grupo: "A", local: "Chequia",        visitante: "Sudáfrica",    fecha: "2026-06-18T16:00:00Z", sede: "Mercedes-Benz Stadium, Atlanta" },
+  { id: "A4", grupo: "A", local: "México",         visitante: "Corea del Sur",fecha: "2026-06-19T02:00:00Z", sede: "Estadio Akron, Guadalajara" },
+  { id: "A5", grupo: "A", local: "Chequia",        visitante: "México",       fecha: "2026-06-26T02:00:00Z", sede: "Estadio Azteca, Ciudad de México" },
+  { id: "A6", grupo: "A", local: "Sudáfrica",      visitante: "Corea del Sur",fecha: "2026-06-26T02:00:00Z", sede: "Estadio BBVA, Monterrey" },
+  { id: "B1", grupo: "B", local: "Canadá",  visitante: "Bosnia",  fecha: "2026-06-12T19:00:00Z", sede: "BMO Field, Toronto" },
+  { id: "B2", grupo: "B", local: "Qatar",   visitante: "Suiza",   fecha: "2026-06-13T19:00:00Z", sede: "Levi's Stadium, San Francisco" },
+  { id: "B3", grupo: "B", local: "Suiza",   visitante: "Bosnia",  fecha: "2026-06-18T19:00:00Z", sede: "SoFi Stadium, Los Ángeles" },
+  { id: "B4", grupo: "B", local: "Canadá",  visitante: "Qatar",   fecha: "2026-06-18T22:00:00Z", sede: "BC Place, Vancouver" },
   { id: "B5", grupo: "B", local: "Suiza",   visitante: "Canadá",  fecha: "2026-06-24T19:00:00Z", sede: "BC Place, Vancouver" },
-  { id: "B6", grupo: "B", local: "Bosnia",  visitante: "Qatar",   fecha: "2026-06-24T19:00:00Z", sede: "Seattle Stadium, Seattle" },
-  { id: "C1", grupo: "C", local: "Brasil",    visitante: "Marruecos", fecha: "2026-06-13T22:00:00Z", sede: "New York New Jersey Stadium" },
-  { id: "C2", grupo: "C", local: "Haití",     visitante: "Escocia",   fecha: "2026-06-14T01:00:00Z", sede: "Boston Stadium, Boston" },
-  { id: "C3", grupo: "C", local: "Escocia",   visitante: "Marruecos", fecha: "2026-06-19T22:00:00Z", sede: "Boston Stadium, Boston" },
-  { id: "C4", grupo: "C", local: "Brasil",    visitante: "Haití",     fecha: "2026-06-20T00:30:00Z", sede: "Philadelphia Stadium, Filadelfia" },
-  { id: "C5", grupo: "C", local: "Escocia",   visitante: "Brasil",    fecha: "2026-06-24T22:00:00Z", sede: "Miami Stadium, Miami" },
-  { id: "C6", grupo: "C", local: "Marruecos", visitante: "Haití",     fecha: "2026-06-24T22:00:00Z", sede: "Atlanta Stadium, Atlanta" },
-  { id: "D1", grupo: "D", local: "Estados Unidos", visitante: "Paraguay",       fecha: "2026-06-13T01:00:00Z", sede: "Los Angeles Stadium, LA" },
+  { id: "B6", grupo: "B", local: "Bosnia",  visitante: "Qatar",   fecha: "2026-06-24T19:00:00Z", sede: "Lumen Field, Seattle" },
+  { id: "C1", grupo: "C", local: "Brasil",    visitante: "Marruecos", fecha: "2026-06-13T22:00:00Z", sede: "MetLife Stadium, Nueva Jersey" },
+  { id: "C2", grupo: "C", local: "Haití",     visitante: "Escocia",   fecha: "2026-06-14T01:00:00Z", sede: "Gillette Stadium, Boston" },
+  { id: "C3", grupo: "C", local: "Escocia",   visitante: "Marruecos", fecha: "2026-06-19T22:00:00Z", sede: "Gillette Stadium, Boston" },
+  { id: "C4", grupo: "C", local: "Brasil",    visitante: "Haití",     fecha: "2026-06-20T01:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
+  { id: "C5", grupo: "C", local: "Escocia",   visitante: "Brasil",    fecha: "2026-06-25T02:00:00Z", sede: "Hard Rock Stadium, Miami" },
+  { id: "C6", grupo: "C", local: "Marruecos", visitante: "Haití",     fecha: "2026-06-25T02:00:00Z", sede: "Mercedes-Benz Stadium, Atlanta" },
+  { id: "D1", grupo: "D", local: "Estados Unidos", visitante: "Paraguay",       fecha: "2026-06-13T01:00:00Z", sede: "SoFi Stadium, Los Ángeles" },
   { id: "D2", grupo: "D", local: "Australia",      visitante: "Turquía",        fecha: "2026-06-14T04:00:00Z", sede: "BC Place, Vancouver" },
-  { id: "D3", grupo: "D", local: "Estados Unidos", visitante: "Australia",      fecha: "2026-06-19T19:00:00Z", sede: "Seattle Stadium, Seattle" },
-  { id: "D4", grupo: "D", local: "Turquía",        visitante: "Paraguay",       fecha: "2026-06-20T03:00:00Z", sede: "San Francisco Bay Area Stadium" },
-  { id: "D5", grupo: "D", local: "Turquía",        visitante: "Estados Unidos", fecha: "2026-06-26T02:00:00Z", sede: "Los Angeles Stadium, LA" },
-  { id: "D6", grupo: "D", local: "Paraguay",       visitante: "Australia",      fecha: "2026-06-26T02:00:00Z", sede: "San Francisco Bay Area Stadium" },
-  { id: "E1", grupo: "E", local: "Alemania",        visitante: "Curazao",         fecha: "2026-06-14T17:00:00Z", sede: "Houston Stadium, Houston" },
-  { id: "E2", grupo: "E", local: "Costa de Marfil", visitante: "Ecuador",         fecha: "2026-06-14T23:00:00Z", sede: "Philadelphia Stadium, Filadelfia" },
-  { id: "E3", grupo: "E", local: "Alemania",        visitante: "Costa de Marfil", fecha: "2026-06-20T20:00:00Z", sede: "Toronto Stadium, Toronto" },
-  { id: "E4", grupo: "E", local: "Ecuador",         visitante: "Curazao",         fecha: "2026-06-21T03:00:00Z", sede: "Kansas City Stadium, Kansas City" },
-  { id: "E5", grupo: "E", local: "Ecuador",         visitante: "Alemania",        fecha: "2026-06-25T20:00:00Z", sede: "New York New Jersey Stadium" },
-  { id: "E6", grupo: "E", local: "Curazao",         visitante: "Costa de Marfil", fecha: "2026-06-25T20:00:00Z", sede: "Philadelphia Stadium, Filadelfia" },
-  { id: "F1", grupo: "F", local: "Países Bajos", visitante: "Japón",        fecha: "2026-06-14T20:00:00Z", sede: "Dallas Stadium, Dallas" },
-  { id: "F2", grupo: "F", local: "Suecia",        visitante: "Túnez",        fecha: "2026-06-15T02:00:00Z", sede: "Estadio Monterrey, Guadalupe" },
-  { id: "F3", grupo: "F", local: "Países Bajos", visitante: "Suecia",       fecha: "2026-06-20T17:00:00Z", sede: "Houston Stadium, Houston" },
-  { id: "F4", grupo: "F", local: "Túnez",         visitante: "Japón",        fecha: "2026-06-21T04:00:00Z", sede: "Estadio Monterrey, Guadalupe" },
-  { id: "F5", grupo: "F", local: "Japón",          visitante: "Suecia",       fecha: "2026-06-25T23:00:00Z", sede: "Dallas Stadium, Dallas" },
-  { id: "F6", grupo: "F", local: "Túnez",          visitante: "Países Bajos", fecha: "2026-06-25T23:00:00Z", sede: "Kansas City Stadium, Kansas City" },
+  { id: "D3", grupo: "D", local: "Estados Unidos", visitante: "Australia",      fecha: "2026-06-19T19:00:00Z", sede: "Lumen Field, Seattle" },
+  { id: "D4", grupo: "D", local: "Turquía",        visitante: "Paraguay",       fecha: "2026-06-20T03:00:00Z", sede: "Levi's Stadium, San Francisco" },
+  { id: "D5", grupo: "D", local: "Turquía",        visitante: "Estados Unidos", fecha: "2026-06-26T19:00:00Z", sede: "SoFi Stadium, Los Ángeles" },
+  { id: "D6", grupo: "D", local: "Paraguay",       visitante: "Australia",      fecha: "2026-06-26T19:00:00Z", sede: "Levi's Stadium, San Francisco" },
+  { id: "E1", grupo: "E", local: "Alemania",        visitante: "Curazao",         fecha: "2026-06-14T17:00:00Z", sede: "NRG Stadium, Houston" },
+  { id: "E2", grupo: "E", local: "Costa de Marfil", visitante: "Ecuador",         fecha: "2026-06-14T23:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
+  { id: "E3", grupo: "E", local: "Alemania",        visitante: "Costa de Marfil", fecha: "2026-06-20T20:00:00Z", sede: "BMO Field, Toronto" },
+  { id: "E4", grupo: "E", local: "Ecuador",         visitante: "Curazao",         fecha: "2026-06-21T00:00:00Z", sede: "Arrowhead Stadium, Kansas City" },
+  { id: "E5", grupo: "E", local: "Ecuador",         visitante: "Alemania",        fecha: "2026-06-26T02:00:00Z", sede: "MetLife Stadium, Nueva Jersey" },
+  { id: "E6", grupo: "E", local: "Curazao",         visitante: "Costa de Marfil", fecha: "2026-06-26T02:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
+  { id: "F1", grupo: "F", local: "Países Bajos", visitante: "Japón",        fecha: "2026-06-14T20:00:00Z", sede: "AT&T Stadium, Dallas" },
+  { id: "F2", grupo: "F", local: "Suecia",        visitante: "Túnez",        fecha: "2026-06-15T02:00:00Z", sede: "Estadio BBVA, Monterrey" },
+  { id: "F3", grupo: "F", local: "Países Bajos", visitante: "Suecia",       fecha: "2026-06-20T17:00:00Z", sede: "NRG Stadium, Houston" },
+  { id: "F4", grupo: "F", local: "Túnez",         visitante: "Japón",        fecha: "2026-06-21T04:00:00Z", sede: "Estadio BBVA, Monterrey" },
+  { id: "F5", grupo: "F", local: "Japón",          visitante: "Suecia",       fecha: "2026-06-26T19:00:00Z", sede: "AT&T Stadium, Dallas" },
+  { id: "F6", grupo: "F", local: "Túnez",          visitante: "Países Bajos", fecha: "2026-06-26T19:00:00Z", sede: "Arrowhead Stadium, Kansas City" },
   { id: "G1", grupo: "G", local: "Bélgica",       visitante: "Egipto",        fecha: "2026-06-15T19:00:00Z", sede: "BC Place, Vancouver" },
-  { id: "G2", grupo: "G", local: "Irán",           visitante: "Nueva Zelanda", fecha: "2026-06-16T01:00:00Z", sede: "Los Angeles Stadium, LA" },
-  { id: "G3", grupo: "G", local: "Bélgica",       visitante: "Irán",          fecha: "2026-06-21T19:00:00Z", sede: "Los Angeles Stadium, LA" },
+  { id: "G2", grupo: "G", local: "Irán",           visitante: "Nueva Zelanda", fecha: "2026-06-16T01:00:00Z", sede: "SoFi Stadium, Los Ángeles" },
+  { id: "G3", grupo: "G", local: "Bélgica",       visitante: "Irán",          fecha: "2026-06-21T19:00:00Z", sede: "SoFi Stadium, Los Ángeles" },
   { id: "G4", grupo: "G", local: "Nueva Zelanda", visitante: "Egipto",        fecha: "2026-06-22T01:00:00Z", sede: "BC Place, Vancouver" },
-  { id: "G5", grupo: "G", local: "Nueva Zelanda", visitante: "Bélgica",       fecha: "2026-06-27T03:00:00Z", sede: "BC Place, Vancouver" },
-  { id: "G6", grupo: "G", local: "Egipto",         visitante: "Irán",          fecha: "2026-06-27T03:00:00Z", sede: "Seattle Stadium, Seattle" },
-  { id: "H1", grupo: "H", local: "España",         visitante: "Cabo Verde",    fecha: "2026-06-15T16:00:00Z", sede: "Atlanta Stadium, Atlanta" },
-  { id: "H2", grupo: "H", local: "Arabia Saudita", visitante: "Uruguay",       fecha: "2026-06-15T22:00:00Z", sede: "Miami Stadium, Miami" },
-  { id: "H3", grupo: "H", local: "España",         visitante: "Arabia Saudita",fecha: "2026-06-21T16:00:00Z", sede: "Atlanta Stadium, Atlanta" },
-  { id: "H4", grupo: "H", local: "Uruguay",        visitante: "Cabo Verde",    fecha: "2026-06-21T22:00:00Z", sede: "Miami Stadium, Miami" },
-  { id: "H5", grupo: "H", local: "Cabo Verde",     visitante: "Arabia Saudita",fecha: "2026-06-27T00:00:00Z", sede: "Houston Stadium, Houston" },
-  { id: "H6", grupo: "H", local: "Uruguay",        visitante: "España",        fecha: "2026-06-27T00:00:00Z", sede: "Estadio Guadalajara, Zapopan" },
-  { id: "I1", grupo: "I", local: "Francia",  visitante: "Senegal", fecha: "2026-06-16T19:00:00Z", sede: "New York New Jersey Stadium" },
-  { id: "I2", grupo: "I", local: "Irak",     visitante: "Noruega", fecha: "2026-06-16T22:00:00Z", sede: "Boston Stadium, Boston" },
-  { id: "I3", grupo: "I", local: "Francia",  visitante: "Irak",    fecha: "2026-06-22T21:00:00Z", sede: "Philadelphia Stadium, Filadelfia" },
-  { id: "I4", grupo: "I", local: "Noruega",  visitante: "Senegal", fecha: "2026-06-23T00:00:00Z", sede: "New York New Jersey Stadium" },
-  { id: "I5", grupo: "I", local: "Noruega",  visitante: "Francia", fecha: "2026-06-26T19:00:00Z", sede: "Boston Stadium, Boston" },
-  { id: "I6", grupo: "I", local: "Senegal",  visitante: "Irak",    fecha: "2026-06-26T19:00:00Z", sede: "Toronto Stadium, Toronto" },
-  { id: "J1", grupo: "J", local: "Argentina", visitante: "Argelia",   fecha: "2026-06-17T01:00:00Z", sede: "Kansas City Stadium, Kansas City" },
-  { id: "J2", grupo: "J", local: "Austria",   visitante: "Jordania",  fecha: "2026-06-17T04:00:00Z", sede: "San Francisco Bay Area Stadium" },
-  { id: "J3", grupo: "J", local: "Argentina", visitante: "Austria",   fecha: "2026-06-22T17:00:00Z", sede: "Dallas Stadium, Dallas" },
-  { id: "J4", grupo: "J", local: "Jordania",  visitante: "Argelia",   fecha: "2026-06-23T03:00:00Z", sede: "San Francisco Bay Area Stadium" },
-  { id: "J5", grupo: "J", local: "Argelia",   visitante: "Austria",   fecha: "2026-06-28T02:00:00Z", sede: "Kansas City Stadium, Kansas City" },
-  { id: "J6", grupo: "J", local: "Jordania",  visitante: "Argentina", fecha: "2026-06-28T02:00:00Z", sede: "Dallas Stadium, Dallas" },
-  { id: "K1", grupo: "K", local: "Portugal",   visitante: "Congo DR",   fecha: "2026-06-17T17:00:00Z", sede: "Houston Stadium, Houston" },
+  { id: "G5", grupo: "G", local: "Nueva Zelanda", visitante: "Bélgica",       fecha: "2026-06-27T19:00:00Z", sede: "BC Place, Vancouver" },
+  { id: "G6", grupo: "G", local: "Egipto",         visitante: "Irán",          fecha: "2026-06-27T19:00:00Z", sede: "Lumen Field, Seattle" },
+  { id: "H1", grupo: "H", local: "España",         visitante: "Cabo Verde",    fecha: "2026-06-15T16:00:00Z", sede: "Mercedes-Benz Stadium, Atlanta" },
+  { id: "H2", grupo: "H", local: "Arabia Saudita", visitante: "Uruguay",       fecha: "2026-06-15T22:00:00Z", sede: "Hard Rock Stadium, Miami" },
+  { id: "H3", grupo: "H", local: "España",         visitante: "Arabia Saudita",fecha: "2026-06-21T16:00:00Z", sede: "Mercedes-Benz Stadium, Atlanta" },
+  { id: "H4", grupo: "H", local: "Uruguay",        visitante: "Cabo Verde",    fecha: "2026-06-21T22:00:00Z", sede: "Hard Rock Stadium, Miami" },
+  { id: "H5", grupo: "H", local: "Cabo Verde",     visitante: "Arabia Saudita",fecha: "2026-06-27T16:00:00Z", sede: "NRG Stadium, Houston" },
+  { id: "H6", grupo: "H", local: "Uruguay",        visitante: "España",        fecha: "2026-06-27T16:00:00Z", sede: "Estadio Akron, Guadalajara" },
+  { id: "I1", grupo: "I", local: "Francia",  visitante: "Senegal", fecha: "2026-06-16T19:00:00Z", sede: "MetLife Stadium, Nueva Jersey" },
+  { id: "I2", grupo: "I", local: "Irak",     visitante: "Noruega", fecha: "2026-06-16T22:00:00Z", sede: "Gillette Stadium, Boston" },
+  { id: "I3", grupo: "I", local: "Francia",  visitante: "Irak",    fecha: "2026-06-22T21:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
+  { id: "I4", grupo: "I", local: "Noruega",  visitante: "Senegal", fecha: "2026-06-23T00:00:00Z", sede: "MetLife Stadium, Nueva Jersey" },
+  { id: "I5", grupo: "I", local: "Noruega",  visitante: "Francia", fecha: "2026-06-26T22:00:00Z", sede: "Gillette Stadium, Boston" },
+  { id: "I6", grupo: "I", local: "Senegal",  visitante: "Irak",    fecha: "2026-06-26T22:00:00Z", sede: "BMO Field, Toronto" },
+  { id: "J1", grupo: "J", local: "Argentina", visitante: "Argelia",   fecha: "2026-06-17T01:00:00Z", sede: "Arrowhead Stadium, Kansas City" },
+  { id: "J2", grupo: "J", local: "Austria",   visitante: "Jordania",  fecha: "2026-06-17T04:00:00Z", sede: "Levi's Stadium, San Francisco" },
+  { id: "J3", grupo: "J", local: "Argentina", visitante: "Austria",   fecha: "2026-06-22T17:00:00Z", sede: "AT&T Stadium, Dallas" },
+  { id: "J4", grupo: "J", local: "Jordania",  visitante: "Argelia",   fecha: "2026-06-23T03:00:00Z", sede: "Levi's Stadium, San Francisco" },
+  { id: "J5", grupo: "J", local: "Argelia",   visitante: "Austria",   fecha: "2026-06-28T02:00:00Z", sede: "Arrowhead Stadium, Kansas City" },
+  { id: "J6", grupo: "J", local: "Jordania",  visitante: "Argentina", fecha: "2026-06-28T02:00:00Z", sede: "AT&T Stadium, Dallas" },
+  { id: "K1", grupo: "K", local: "Portugal",   visitante: "Congo DR",   fecha: "2026-06-17T17:00:00Z", sede: "NRG Stadium, Houston" },
   { id: "K2", grupo: "K", local: "Uzbekistán", visitante: "Colombia",   fecha: "2026-06-18T02:00:00Z", sede: "Estadio Azteca, Ciudad de México" },
-  { id: "K3", grupo: "K", local: "Portugal",   visitante: "Uzbekistán", fecha: "2026-06-23T17:00:00Z", sede: "Houston Stadium, Houston" },
-  { id: "K4", grupo: "K", local: "Colombia",   visitante: "Congo DR",   fecha: "2026-06-24T02:00:00Z", sede: "Estadio Guadalajara, Zapopan" },
-  { id: "K5", grupo: "K", local: "Colombia",   visitante: "Portugal",   fecha: "2026-06-28T23:30:00Z", sede: "Miami Stadium, Miami" },
-  { id: "K6", grupo: "K", local: "Congo DR",   visitante: "Uzbekistán", fecha: "2026-06-28T23:30:00Z", sede: "Atlanta Stadium, Atlanta" },
-  { id: "L1", grupo: "L", local: "Inglaterra", visitante: "Croacia", fecha: "2026-06-17T20:00:00Z", sede: "Dallas Stadium, Dallas" },
-  { id: "L2", grupo: "L", local: "Ghana",      visitante: "Panamá",  fecha: "2026-06-17T23:00:00Z", sede: "Toronto Stadium, Toronto" },
-  { id: "L3", grupo: "L", local: "Inglaterra", visitante: "Ghana",   fecha: "2026-06-23T20:00:00Z", sede: "Boston Stadium, Boston" },
-  { id: "L4", grupo: "L", local: "Panamá",     visitante: "Croacia", fecha: "2026-06-23T23:00:00Z", sede: "Toronto Stadium, Toronto" },
-  { id: "L5", grupo: "L", local: "Panamá",     visitante: "Inglaterra", fecha: "2026-06-27T21:00:00Z", sede: "New York New Jersey Stadium" },
-  { id: "L6", grupo: "L", local: "Croacia",    visitante: "Ghana",      fecha: "2026-06-27T21:00:00Z", sede: "Philadelphia Stadium, Filadelfia" },
+  { id: "K3", grupo: "K", local: "Portugal",   visitante: "Uzbekistán", fecha: "2026-06-23T17:00:00Z", sede: "NRG Stadium, Houston" },
+  { id: "K4", grupo: "K", local: "Colombia",   visitante: "Congo DR",   fecha: "2026-06-24T02:00:00Z", sede: "Estadio Akron, Guadalajara" },
+  { id: "K5", grupo: "K", local: "Colombia",   visitante: "Portugal",   fecha: "2026-06-29T02:00:00Z", sede: "Hard Rock Stadium, Miami" },
+  { id: "K6", grupo: "K", local: "Congo DR",   visitante: "Uzbekistán", fecha: "2026-06-29T02:00:00Z", sede: "Mercedes-Benz Stadium, Atlanta" },
+  { id: "L1", grupo: "L", local: "Inglaterra", visitante: "Croacia", fecha: "2026-06-17T20:00:00Z", sede: "AT&T Stadium, Dallas" },
+  { id: "L2", grupo: "L", local: "Ghana",      visitante: "Panamá",  fecha: "2026-06-17T23:00:00Z", sede: "BMO Field, Toronto" },
+  { id: "L3", grupo: "L", local: "Inglaterra", visitante: "Ghana",   fecha: "2026-06-23T20:00:00Z", sede: "Gillette Stadium, Boston" },
+  { id: "L4", grupo: "L", local: "Panamá",     visitante: "Croacia", fecha: "2026-06-23T23:00:00Z", sede: "BMO Field, Toronto" },
+  { id: "L5", grupo: "L", local: "Panamá",     visitante: "Inglaterra", fecha: "2026-06-28T02:00:00Z", sede: "MetLife Stadium, Nueva Jersey" },
+  { id: "L6", grupo: "L", local: "Croacia",    visitante: "Ghana",      fecha: "2026-06-28T02:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
 ];
 
 // ─── API FOOTBALL-DATA.ORG ────────────────────────────────────────────────
@@ -192,36 +192,39 @@ function encontrarPartidoId(homeEn, awayEn) {
 }
 
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
-  if (!FOOTBALL_API_KEY || FOOTBALL_API_KEY === "TU_API_KEY_AQUI") return;
   try {
-    const res = await fetch(
-      `https://api.football-data.org/v4/competitions/${WC_COMPETITION_ID}/matches?status=FINISHED`,
-      { headers: { "X-Auth-Token": FOOTBALL_API_KEY } }
-    );
+    const res = await fetch("https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json");
     if (!res.ok) return;
     const data = await res.json();
-    const partidosFinalizados = data.matches || [];
+    const partidos = data.matches || [];
+
     const resultadosActuales = await fbGet("global", "resultados") || {};
     let huboCambios = false;
 
-    for (const m of partidosFinalizados) {
-      // Intentar con name primero, luego shortName
-      const homeEn = m.homeTeam?.name || m.homeTeam?.shortName;
-      const awayEn = m.awayTeam?.name || m.awayTeam?.shortName;
-      const golesHome = m.score?.fullTime?.home;
-      const golesAway = m.score?.fullTime?.away;
-      if (!homeEn || !awayEn || golesHome === null || golesHome === undefined) continue;
+    for (const m of partidos) {
+      // Solo procesar partidos con resultado (tienen score.ft)
+      if (!m.score || !m.score.ft) continue;
+      const homeEn = m.team1;
+      const awayEn = m.team2;
+      const golesHome = m.score.ft[0];
+      const golesAway = m.score.ft[1];
+      if (golesHome === undefined || golesAway === undefined) continue;
 
       const match = encontrarPartidoId(homeEn, awayEn);
       if (!match) {
         console.warn("No se encontró partido para:", homeEn, "vs", awayEn);
         continue;
       }
-      // Siempre actualizar con el resultado oficial de la API (sobreescribe manuales)
-      resultadosActuales[match.id] = match.invertido
+      const nuevoRes = match.invertido
         ? { localGoles: golesAway, visitanteGoles: golesHome }
         : { localGoles: golesHome, visitanteGoles: golesAway };
-      huboCambios = true;
+
+      // Solo actualizar si cambió
+      const actual = resultadosActuales[match.id];
+      if (!actual || actual.localGoles !== nuevoRes.localGoles || actual.visitanteGoles !== nuevoRes.visitanteGoles) {
+        resultadosActuales[match.id] = nuevoRes;
+        huboCambios = true;
+      }
     }
 
     if (huboCambios) {
