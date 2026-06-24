@@ -148,9 +148,10 @@ const PARTIDOS_BASE = [
 const TEAM_MAP = {
   // Grupo A
   "Mexico": "México", "South Africa": "Sudáfrica",
-  "South Korea": "Corea del Sur", "Korea Republic": "Corea del Sur", "Czechia": "Chequia",
+  "South Korea": "Corea del Sur", "Korea Republic": "Corea del Sur", "Czechia": "Chequia", "Czech Republic": "Chequia",
   // Grupo B
   "Canada": "Canadá", "Bosnia-Herzegovina": "Bosnia", "Bosnia and Herzegovina": "Bosnia",
+  "Bosnia & Herzegovina": "Bosnia",
   "Qatar": "Qatar", "Switzerland": "Suiza",
   // Grupo C
   "Brazil": "Brasil", "Morocco": "Marruecos", "Haiti": "Haití", "Scotland": "Escocia",
@@ -180,14 +181,32 @@ const TEAM_MAP = {
   "England": "Inglaterra", "Croatia": "Croacia", "Ghana": "Ghana", "Panama": "Panamá",
 };
 
-function encontrarPartidoId(homeEn, awayEn) {
+function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
   const homeEs = TEAM_MAP[homeEn] || homeEn;
   const awayEs = TEAM_MAP[awayEn] || awayEn;
-  const p = PARTIDOS_BASE.find(p =>
+  // Buscar TODOS los candidatos que coincidan por nombre (puede haber más de uno si los mismos equipos juegan dos veces, aunque no debería en fase de grupos)
+  const candidatos = PARTIDOS_BASE.filter(p =>
     (p.local === homeEs && p.visitante === awayEs) ||
     (p.local === awayEs && p.visitante === homeEs)
   );
-  return p ? { id: p.id, invertido: p.local === awayEs } : null;
+  if (candidatos.length === 0) return null;
+  if (candidatos.length === 1) {
+    const p = candidatos[0];
+    return { id: p.id, invertido: p.local === awayEs };
+  }
+  // Si hay más de un candidato, elegir el más cercano en fecha a la fecha real del partido
+  if (fechaPartido) {
+    const fechaPartidoMs = new Date(fechaPartido).getTime();
+    let mejor = candidatos[0];
+    let mejorDiff = Math.abs(new Date(mejor.fecha).getTime() - fechaPartidoMs);
+    for (const c of candidatos) {
+      const diff = Math.abs(new Date(c.fecha).getTime() - fechaPartidoMs);
+      if (diff < mejorDiff) { mejor = c; mejorDiff = diff; }
+    }
+    return { id: mejor.id, invertido: mejor.local === awayEs };
+  }
+  const p = candidatos[0];
+  return { id: p.id, invertido: p.local === awayEs };
 }
 
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
@@ -210,7 +229,22 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
       if (golesHome === undefined || golesAway === undefined) continue;
       if (golesHome === null || golesAway === null) continue;
 
-      const match = encontrarPartidoId(homeEn, awayEn);
+      // Construir fecha aproximada del partido desde la API (date + time con offset UTC-X)
+      let fechaPartidoApi = null;
+      if (m.date) {
+        // m.time viene como "15:00 UTC-4" — extraemos la hora local y el offset
+        const timeMatch = (m.time || "").match(/(\d{1,2}):(\d{2})\s*UTC([+-]\d+)/);
+        if (timeMatch) {
+          const [, hh, mm, offset] = timeMatch;
+          const offsetNum = parseInt(offset);
+          const horaUTC = (parseInt(hh) - offsetNum + 24) % 24;
+          fechaPartidoApi = `${m.date}T${String(horaUTC).padStart(2,"0")}:${mm}:00Z`;
+        } else {
+          fechaPartidoApi = `${m.date}T12:00:00Z`; // fallback aproximado
+        }
+      }
+
+      const match = encontrarPartidoId(homeEn, awayEn, fechaPartidoApi);
       if (!match) {
         console.warn("No se encontró partido para:", homeEn, "vs", awayEn);
         continue;
@@ -218,7 +252,6 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
 
       // Protección anti falso-positivo: solo aceptar el resultado si el partido,
       // según NUESTRA fecha programada, ya debería haber terminado
-      // (han pasado al menos 100 minutos desde su hora de inicio)
       const partidoInfo = PARTIDOS_BASE.find(p => p.id === match.id);
       if (partidoInfo) {
         const inicio = new Date(partidoInfo.fecha);
