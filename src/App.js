@@ -208,12 +208,27 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
       const golesHome = m.score.ft[0];
       const golesAway = m.score.ft[1];
       if (golesHome === undefined || golesAway === undefined) continue;
+      if (golesHome === null || golesAway === null) continue;
 
       const match = encontrarPartidoId(homeEn, awayEn);
       if (!match) {
         console.warn("No se encontró partido para:", homeEn, "vs", awayEn);
         continue;
       }
+
+      // Protección anti falso-positivo: solo aceptar el resultado si el partido,
+      // según NUESTRA fecha programada, ya debería haber terminado
+      // (han pasado al menos 100 minutos desde su hora de inicio)
+      const partidoInfo = PARTIDOS_BASE.find(p => p.id === match.id);
+      if (partidoInfo) {
+        const inicio = new Date(partidoInfo.fecha);
+        const minutosTranscurridos = (Date.now() - inicio.getTime()) / 60000;
+        if (minutosTranscurridos < 100) {
+          console.warn(`Ignorando resultado de ${match.id} — el partido aún no debería haber terminado (${homeEn} vs ${awayEn})`);
+          continue;
+        }
+      }
+
       const nuevoRes = match.invertido
         ? { localGoles: golesAway, visitanteGoles: golesHome }
         : { localGoles: golesHome, visitanteGoles: golesAway };
