@@ -209,6 +209,10 @@ function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
   return { id: p.id, invertido: p.local === awayEs };
 }
 
+// IDs de partidos excluidos del sync automático — se actualizan SOLO manualmente desde el panel Admin.
+// Agregar aquí cualquier partido que esté dando problemas de matching incorrecto con la API.
+const IDS_SYNC_BLOQUEADOS = ["E4", "F4"];
+
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
   try {
     const res = await fetch("https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json");
@@ -247,6 +251,11 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
       const match = encontrarPartidoId(homeEn, awayEn, fechaPartidoApi);
       if (!match) {
         console.warn("No se encontró partido para:", homeEn, "vs", awayEn);
+        continue;
+      }
+
+      // Si este partido está en la lista de bloqueados, NUNCA lo tocamos automáticamente
+      if (IDS_SYNC_BLOQUEADOS.includes(match.id)) {
         continue;
       }
 
