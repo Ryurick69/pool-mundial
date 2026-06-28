@@ -142,7 +142,30 @@ const PARTIDOS_BASE = [
   { id: "L6", grupo: "L", local: "Croacia",    visitante: "Ghana",      fecha: "2026-06-27T21:00:00Z", sede: "Lincoln Financial Field, Filadelfia" },
 ];
 
-// ─── API FOOTBALL-DATA.ORG ────────────────────────────────────────────────
+// ─── ELIMINATORIA DE 32 (OCTAVOS DE FINAL) ────────────────────────────────
+// IMPORTANTE: el resultado a pronosticar/puntuar es el de 90 minutos + alargue (tiempo extra).
+// Los penales NUNCA se consideran para el marcador ni para el punto de ganador/empate.
+const PARTIDOS_ELIMINATORIA = [
+  { id: "R32_1",  grupo: "R32", local: "Sudáfrica",        visitante: "Canadá",    fecha: "2026-06-29T19:00:00Z", sede: "Por confirmar" },
+  { id: "R32_2",  grupo: "R32", local: "Brasil",            visitante: "Japón",     fecha: "2026-06-30T17:00:00Z", sede: "Por confirmar" },
+  { id: "R32_3",  grupo: "R32", local: "Alemania",          visitante: "Paraguay",  fecha: "2026-06-30T20:30:00Z", sede: "Por confirmar" },
+  { id: "R32_4",  grupo: "R32", local: "Países Bajos",      visitante: "Marruecos", fecha: "2026-07-01T01:00:00Z", sede: "Por confirmar" },
+  { id: "R32_5",  grupo: "R32", local: "Costa de Marfil",   visitante: "Noruega",   fecha: "2026-06-30T17:00:00Z", sede: "Por confirmar" },
+  { id: "R32_6",  grupo: "R32", local: "Francia",           visitante: "Suecia",    fecha: "2026-06-30T21:00:00Z", sede: "Por confirmar" },
+  { id: "R32_7",  grupo: "R32", local: "México",            visitante: "Ecuador",   fecha: "2026-07-01T01:00:00Z", sede: "Por confirmar" },
+  { id: "R32_8",  grupo: "R32", local: "Inglaterra",        visitante: "Congo DR",  fecha: "2026-07-01T16:00:00Z", sede: "Por confirmar" },
+  { id: "R32_9",  grupo: "R32", local: "Bélgica",           visitante: "Senegal",   fecha: "2026-07-01T20:00:00Z", sede: "Por confirmar" },
+  { id: "R32_10", grupo: "R32", local: "Estados Unidos",    visitante: "Bosnia",    fecha: "2026-07-02T00:00:00Z", sede: "Por confirmar" },
+  { id: "R32_11", grupo: "R32", local: "España",            visitante: "Austria",   fecha: "2026-07-02T19:00:00Z", sede: "Por confirmar" },
+  { id: "R32_12", grupo: "R32", local: "Portugal",          visitante: "Croacia",   fecha: "2026-07-02T23:00:00Z", sede: "Por confirmar" },
+  { id: "R32_13", grupo: "R32", local: "Suiza",             visitante: "Argelia",   fecha: "2026-07-03T03:00:00Z", sede: "Por confirmar" },
+  { id: "R32_14", grupo: "R32", local: "Australia",         visitante: "Egipto",    fecha: "2026-07-03T18:00:00Z", sede: "Por confirmar" },
+  { id: "R32_15", grupo: "R32", local: "Argentina",         visitante: "Cabo Verde",fecha: "2026-07-03T22:00:00Z", sede: "Por confirmar" },
+  { id: "R32_16", grupo: "R32", local: "Colombia",          visitante: "Ghana",     fecha: "2026-07-04T01:30:00Z", sede: "Por confirmar" },
+];
+
+// Lista combinada de todos los partidos (grupos + eliminatoria) para búsquedas y sincronización
+const TODOS_LOS_PARTIDOS = [...PARTIDOS_BASE, ...PARTIDOS_ELIMINATORIA];
 
 
 const TEAM_MAP = {
@@ -185,7 +208,7 @@ function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
   const homeEs = TEAM_MAP[homeEn] || homeEn;
   const awayEs = TEAM_MAP[awayEn] || awayEn;
   // Buscar TODOS los candidatos que coincidan por nombre (puede haber más de uno si los mismos equipos juegan dos veces, aunque no debería en fase de grupos)
-  const candidatos = PARTIDOS_BASE.filter(p =>
+  const candidatos = TODOS_LOS_PARTIDOS.filter(p =>
     (p.local === homeEs && p.visitante === awayEs) ||
     (p.local === awayEs && p.visitante === homeEs)
   );
@@ -210,8 +233,11 @@ function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
 }
 
 // IDs de partidos excluidos del sync automático — se actualizan SOLO manualmente desde el panel Admin.
-// Agregar aquí cualquier partido que esté dando problemas de matching incorrecto con la API.
-const IDS_SYNC_BLOQUEADOS = ["E4", "F4"];
+// Los partidos de eliminatoria (R32_*) se bloquean siempre: la fuente externa no distingue
+// entre resultado de 90min+alargue y el resultado final con penales, así que deben ingresarse a mano.
+const IDS_SYNC_BLOQUEADOS = ["E4", "F4",
+  "R32_1","R32_2","R32_3","R32_4","R32_5","R32_6","R32_7","R32_8",
+  "R32_9","R32_10","R32_11","R32_12","R32_13","R32_14","R32_15","R32_16"];
 
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
   try {
@@ -261,7 +287,7 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
 
       // Protección anti falso-positivo: solo aceptar el resultado si el partido,
       // según NUESTRA fecha programada, ya debería haber terminado
-      const partidoInfo = PARTIDOS_BASE.find(p => p.id === match.id);
+      const partidoInfo = TODOS_LOS_PARTIDOS.find(p => p.id === match.id);
       if (partidoInfo) {
         const inicio = new Date(partidoInfo.fecha);
         const minutosTranscurridos = (Date.now() - inicio.getTime()) / 60000;
@@ -600,9 +626,9 @@ function HoyView({ resultados, misPronosticos, onGuardar }) {
   const hoyStr = hoy.toLocaleDateString("en-CA");
   const mananaStr = new Date(hoy.getTime() + 86400000).toLocaleDateString("en-CA");
 
-  const partidosHoy = PARTIDOS_BASE.filter(p => new Date(p.fecha).toLocaleDateString("en-CA") === hoyStr)
+  const partidosHoy = TODOS_LOS_PARTIDOS.filter(p => new Date(p.fecha).toLocaleDateString("en-CA") === hoyStr)
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-  const partidosManana = PARTIDOS_BASE.filter(p => new Date(p.fecha).toLocaleDateString("en-CA") === mananaStr)
+  const partidosManana = TODOS_LOS_PARTIDOS.filter(p => new Date(p.fecha).toLocaleDateString("en-CA") === mananaStr)
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
   async function guardar(pid, goles) {
@@ -666,7 +692,10 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
 
   useEffect(() => { setPronosticoLocal({ ...misPronosticos }); }, [misPronosticos]);
 
-  const partidosGrupo = PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const esEliminatoria = grupoActivo === "R32";
+  const partidosGrupo = esEliminatoria
+    ? PARTIDOS_ELIMINATORIA
+    : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
 
   async function guardar(pid, goles) {
     await onGuardar(pid, goles);
@@ -682,18 +711,29 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
             Grupo {g}
           </button>
         ))}
+        <button onClick={() => setGrupoActivo("R32")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R32" ? "bg-yellow-500 text-black" : "bg-white/5 text-yellow-400 border border-yellow-500/30"}`}>
+          🏆 Octavos
+        </button>
       </div>
       {msg && <div className="mx-1 mt-2 bg-green-500/20 border border-green-500/40 text-green-400 text-sm text-center py-2 rounded-xl">{msg}</div>}
-      <div className="mx-1 mt-3 bg-white/5 border border-white/10 rounded-xl p-3 mb-3">
-        <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Equipos — Grupo {grupoActivo}</p>
-        <div className="flex flex-wrap gap-2">
-          {GRUPOS[grupoActivo].map(e => <span key={e} className="text-sm">{flag(e)} {e}</span>)}
+      {esEliminatoria ? (
+        <div className="mx-1 mt-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-3">
+          <p className="text-xs text-yellow-400 font-semibold">⚠️ Fase eliminatoria — Octavos de final</p>
+          <p className="text-gray-400 text-xs mt-1">El resultado válido es 90 min + alargue (si lo hay). Los penales no cuentan para el pronóstico.</p>
         </div>
-      </div>
+      ) : (
+        <div className="mx-1 mt-3 bg-white/5 border border-white/10 rounded-xl p-3 mb-3">
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Equipos — Grupo {grupoActivo}</p>
+          <div className="flex flex-wrap gap-2">
+            {GRUPOS[grupoActivo].map(e => <span key={e} className="text-sm">{flag(e)} {e}</span>)}
+          </div>
+        </div>
+      )}
       <div className="space-y-3 px-1">
         {partidosGrupo.map(p => (
           <CardPartido key={p.id} p={p} resultados={resultados} misPronosticos={misPronosticos}
-            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} />
+            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} showGrupo={esEliminatoria} />
         ))}
       </div>
     </div>
@@ -751,7 +791,7 @@ function AdminView({ resultados, onGuardarResultado }) {
   const [editandoAdmin, setEditandoAdmin] = useState({});
   const [msg, setMsg] = useState("");
 
-  const partidosGrupo = PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const partidosGrupo = grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
 
   async function guardar(partido) {
     const inp = inputs[partido.id];
@@ -767,7 +807,7 @@ function AdminView({ resultados, onGuardarResultado }) {
     <div className="pb-4">
       <div className="mx-1 mb-4 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
         <p className="text-red-400 text-xs font-semibold">⚙️ Panel de administración — solo visible para ti</p>
-        <p className="text-gray-500 text-xs mt-1">Ingresa los resultados reales de cada partido aquí.</p>
+        <p className="text-gray-500 text-xs mt-1">Ingresa los resultados reales de cada partido aquí. En octavos, ingresa el resultado de 90 min + alargue (sin penales).</p>
       </div>
       {msg && <div className="mx-1 mb-3 bg-green-500/20 border border-green-500/40 text-green-400 text-sm text-center py-2 rounded-xl">{msg}</div>}
       <div className="flex gap-1 overflow-x-auto pb-2 px-1">
@@ -777,6 +817,10 @@ function AdminView({ resultados, onGuardarResultado }) {
             Grupo {g}
           </button>
         ))}
+        <button onClick={() => setGrupoActivo("R32")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R32" ? "bg-yellow-500 text-black" : "bg-white/5 text-yellow-400 border border-yellow-500/30"}`}>
+          🏆 Octavos
+        </button>
       </div>
       <div className="space-y-3 px-1 mt-3">
         {partidosGrupo.map(p => {
