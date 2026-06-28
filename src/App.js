@@ -951,14 +951,15 @@ export default function App() {
       setLoading(false);
       // Limpieza de NaN y duplicados (se ejecuta una vez al cargar)
       await limpiarNaNyDuplicados();
-      // Sincronizar resultados con API
-      sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
+      // SYNC AUTOMÁTICO DESACTIVADO — los resultados se ingresan manualmente desde el panel Admin.
+      // sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
     }
     init();
-    const intervalo = setInterval(() => {
-      sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
-    }, 5 * 60 * 1000);
-    return () => clearInterval(intervalo);
+    // Intervalo de sync automático desactivado.
+    // const intervalo = setInterval(() => {
+    //   sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
+    // }, 5 * 60 * 1000);
+    // return () => clearInterval(intervalo);
   }, []);
 
   useEffect(() => {
