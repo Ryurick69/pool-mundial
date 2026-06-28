@@ -239,6 +239,7 @@ const IDS_SYNC_BLOQUEADOS = ["E4", "F4",
   "R32_1","R32_2","R32_3","R32_4","R32_5","R32_6","R32_7","R32_8",
   "R32_9","R32_10","R32_11","R32_12","R32_13","R32_14","R32_15","R32_16"];
 
+// eslint-disable-next-line no-unused-vars
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
   try {
     const res = await fetch("https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json");
@@ -940,6 +941,7 @@ export default function App() {
   const [resultados, setResultados] = useState({});
   const [todosPronosticos, setTodosPronosticos] = useState({});
   const [misPronosticos, setMisPronosticos] = useState({});
+  // eslint-disable-next-line no-unused-vars
   const [ultimaSync, setUltimaSync] = useState(null);
 
   useEffect(() => {
