@@ -164,9 +164,21 @@ const PARTIDOS_ELIMINATORIA = [
   { id: "R32_16", grupo: "R32", local: "Colombia",          visitante: "Ghana",     fecha: "2026-07-04T01:30:00Z", sede: "Por confirmar" },
 ];
 
-// Lista combinada de todos los partidos (grupos + eliminatoria) para búsquedas y sincronización
-const TODOS_LOS_PARTIDOS = [...PARTIDOS_BASE, ...PARTIDOS_ELIMINATORIA];
+// ─── OCTAVOS DE FINAL (RONDA DE 16) ─────────────────────────────────────
+// Cruces reales según resultados de fase de grupos.
+// Resultado válido: 90 min + alargue. Penales NO cuentan.
+const PARTIDOS_R16 = [
+  { id: "R16_1", grupo: "R16", local: "Canadá",         visitante: "Marruecos", fecha: "2026-07-04T17:00:00Z", sede: "Por confirmar" },
+  { id: "R16_2", grupo: "R16", local: "Paraguay",        visitante: "Francia",   fecha: "2026-07-04T21:00:00Z", sede: "Por confirmar" },
+  { id: "R16_3", grupo: "R16", local: "Brasil",          visitante: "Noruega",   fecha: "2026-07-05T20:00:00Z", sede: "Por confirmar" },
+  { id: "R16_4", grupo: "R16", local: "México",          visitante: "Inglaterra",fecha: "2026-07-06T00:00:00Z", sede: "Por confirmar" },
+  { id: "R16_5", grupo: "R16", local: "Portugal",        visitante: "España",    fecha: "2026-07-06T19:00:00Z", sede: "Por confirmar" },
+  { id: "R16_6", grupo: "R16", local: "Estados Unidos",  visitante: "Bélgica",   fecha: "2026-07-07T00:00:00Z", sede: "Por confirmar" },
+  // R16_7 y R16_8 pendientes de definir
+];
 
+// Lista combinada de todos los partidos para búsquedas, vista Hoy y sincronización
+const TODOS_LOS_PARTIDOS = [...PARTIDOS_BASE, ...PARTIDOS_ELIMINATORIA, ...PARTIDOS_R16];
 
 const TEAM_MAP = {
   // Grupo A
@@ -237,7 +249,8 @@ function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
 // entre resultado de 90min+alargue y el resultado final con penales, así que deben ingresarse a mano.
 const IDS_SYNC_BLOQUEADOS = ["E4", "F4",
   "R32_1","R32_2","R32_3","R32_4","R32_5","R32_6","R32_7","R32_8",
-  "R32_9","R32_10","R32_11","R32_12","R32_13","R32_14","R32_15","R32_16"];
+  "R32_9","R32_10","R32_11","R32_12","R32_13","R32_14","R32_15","R32_16",
+  "R16_1","R16_2","R16_3","R16_4","R16_5","R16_6","R16_7","R16_8"];
 
 // eslint-disable-next-line no-unused-vars
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
@@ -694,9 +707,12 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
   useEffect(() => { setPronosticoLocal({ ...misPronosticos }); }, [misPronosticos]);
 
   const esEliminatoria = grupoActivo === "R32";
-  const partidosGrupo = esEliminatoria
-    ? PARTIDOS_ELIMINATORIA
-    : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const esR16 = grupoActivo === "R16";
+  const partidosGrupo = esR16
+    ? PARTIDOS_R16
+    : esEliminatoria
+      ? PARTIDOS_ELIMINATORIA
+      : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
 
   async function guardar(pid, goles) {
     await onGuardar(pid, goles);
@@ -714,13 +730,17 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
         ))}
         <button onClick={() => setGrupoActivo("R32")}
           className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R32" ? "bg-yellow-500 text-black" : "bg-white/5 text-yellow-400 border border-yellow-500/30"}`}>
-          🏆 Octavos
+          🔹 Elim. 32
+        </button>
+        <button onClick={() => setGrupoActivo("R16")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R16" ? "bg-orange-500 text-black" : "bg-white/5 text-orange-400 border border-orange-500/30"}`}>
+          ⚽ Octavos
         </button>
       </div>
       {msg && <div className="mx-1 mt-2 bg-green-500/20 border border-green-500/40 text-green-400 text-sm text-center py-2 rounded-xl">{msg}</div>}
-      {esEliminatoria ? (
+      {(esEliminatoria || esR16) ? (
         <div className="mx-1 mt-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-3">
-          <p className="text-xs text-yellow-400 font-semibold">⚠️ Fase eliminatoria — Octavos de final</p>
+          <p className="text-xs text-yellow-400 font-semibold">⚠️ {esR16 ? "Octavos de final" : "Eliminatoria de 32"}</p>
           <p className="text-gray-400 text-xs mt-1">El resultado válido es 90 min + alargue (si lo hay). Los penales no cuentan para el pronóstico.</p>
         </div>
       ) : (
@@ -734,7 +754,7 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
       <div className="space-y-3 px-1">
         {partidosGrupo.map(p => (
           <CardPartido key={p.id} p={p} resultados={resultados} misPronosticos={misPronosticos}
-            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} showGrupo={esEliminatoria} />
+            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} showGrupo={esEliminatoria || esR16} />
         ))}
       </div>
     </div>
@@ -792,7 +812,7 @@ function AdminView({ resultados, onGuardarResultado }) {
   const [editandoAdmin, setEditandoAdmin] = useState({});
   const [msg, setMsg] = useState("");
 
-  const partidosGrupo = grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const partidosGrupo = grupoActivo === "R16" ? PARTIDOS_R16 : grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
 
   async function guardar(partido) {
     const inp = inputs[partido.id];
@@ -820,7 +840,11 @@ function AdminView({ resultados, onGuardarResultado }) {
         ))}
         <button onClick={() => setGrupoActivo("R32")}
           className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R32" ? "bg-yellow-500 text-black" : "bg-white/5 text-yellow-400 border border-yellow-500/30"}`}>
-          🏆 Octavos
+          🔹 Elim. 32
+        </button>
+        <button onClick={() => setGrupoActivo("R16")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R16" ? "bg-orange-500 text-black" : "bg-white/5 text-orange-400 border border-orange-500/30"}`}>
+          ⚽ Octavos
         </button>
       </div>
       <div className="space-y-3 px-1 mt-3">
