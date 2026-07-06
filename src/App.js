@@ -174,7 +174,8 @@ const PARTIDOS_R16 = [
   { id: "R16_4", grupo: "R16", local: "México",          visitante: "Inglaterra",fecha: "2026-07-06T00:00:00Z", sede: "Por confirmar" },
   { id: "R16_5", grupo: "R16", local: "Portugal",        visitante: "España",    fecha: "2026-07-06T19:00:00Z", sede: "Por confirmar" },
   { id: "R16_6", grupo: "R16", local: "Estados Unidos",  visitante: "Bélgica",   fecha: "2026-07-07T00:00:00Z", sede: "Por confirmar" },
-  // R16_7 y R16_8 pendientes de definir
+  { id: "R16_7", grupo: "R16", local: "Argentina",       visitante: "Egipto",    fecha: "2026-07-07T16:00:00Z", sede: "Por confirmar" },
+  { id: "R16_8", grupo: "R16", local: "Suiza",           visitante: "Colombia",  fecha: "2026-07-07T20:00:00Z", sede: "Por confirmar" },
 ];
 
 // Lista combinada de todos los partidos para búsquedas, vista Hoy y sincronización
