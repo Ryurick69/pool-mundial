@@ -1107,9 +1107,7 @@ export default function App() {
   const finalesConBracket = aplicarBracket(PARTIDOS_FINALES);
 
   // Verifica si un partido tiene ambos equipos definidos (no "Por definir")
-  function partidoDefinido(p) {
-    return p.local !== "Por definir" && p.visitante !== "Por definir";
-  }
+  async function guardarPronostico(partidoId, goles) {
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
     const emailKey = emailToKey(usuario.email);
