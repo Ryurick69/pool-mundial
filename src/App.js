@@ -178,8 +178,28 @@ const PARTIDOS_R16 = [
   { id: "R16_8", grupo: "R16", local: "Suiza",           visitante: "Colombia",  fecha: "2026-07-07T20:00:00Z", sede: "Por confirmar" },
 ];
 
+// ─── CUARTOS DE FINAL ────────────────────────────────────────────────────
+const PARTIDOS_QF = [
+  { id: "QF1", grupo: "QF", local: "Francia",      visitante: "Marruecos",   fecha: "2026-07-09T20:00:00Z", sede: "Por confirmar" },
+  { id: "QF2", grupo: "QF", local: "España",       visitante: "Bélgica",     fecha: "2026-07-10T19:00:00Z", sede: "Por confirmar" },
+  { id: "QF3", grupo: "QF", local: "Noruega",      visitante: "Inglaterra",  fecha: "2026-07-11T21:00:00Z", sede: "Por confirmar" },
+  { id: "QF4", grupo: "QF", local: "Por definir",  visitante: "Por definir", fecha: "2026-07-12T01:00:00Z", sede: "Por confirmar" },
+];
+
+// ─── SEMIFINALES ──────────────────────────────────────────────────────────
+const PARTIDOS_SF = [
+  { id: "SF1", grupo: "SF", local: "Por definir", visitante: "Por definir", fecha: "2026-07-14T19:00:00Z", sede: "Por confirmar" },
+  { id: "SF2", grupo: "SF", local: "Por definir", visitante: "Por definir", fecha: "2026-07-15T19:00:00Z", sede: "Por confirmar" },
+];
+
+// ─── TERCER LUGAR Y FINAL ─────────────────────────────────────────────────
+const PARTIDOS_FINALES = [
+  { id: "3PL", grupo: "3PL", local: "Por definir", visitante: "Por definir", fecha: "2026-07-18T21:00:00Z", sede: "Por confirmar" },
+  { id: "FIN", grupo: "FIN", local: "Por definir", visitante: "Por definir", fecha: "2026-07-19T19:00:00Z", sede: "Por confirmar" },
+];
+
 // Lista combinada de todos los partidos para búsquedas, vista Hoy y sincronización
-const TODOS_LOS_PARTIDOS = [...PARTIDOS_BASE, ...PARTIDOS_ELIMINATORIA, ...PARTIDOS_R16];
+const TODOS_LOS_PARTIDOS = [...PARTIDOS_BASE, ...PARTIDOS_ELIMINATORIA, ...PARTIDOS_R16, ...PARTIDOS_QF, ...PARTIDOS_SF, ...PARTIDOS_FINALES];
 
 const TEAM_MAP = {
   // Grupo A
@@ -251,7 +271,8 @@ function encontrarPartidoId(homeEn, awayEn, fechaPartido) {
 const IDS_SYNC_BLOQUEADOS = ["E4", "F4",
   "R32_1","R32_2","R32_3","R32_4","R32_5","R32_6","R32_7","R32_8",
   "R32_9","R32_10","R32_11","R32_12","R32_13","R32_14","R32_15","R32_16",
-  "R16_1","R16_2","R16_3","R16_4","R16_5","R16_6","R16_7","R16_8"];
+  "R16_1","R16_2","R16_3","R16_4","R16_5","R16_6","R16_7","R16_8",
+  "QF1","QF2","QF3","QF4","SF1","SF2","3PL","FIN"];
 
 // eslint-disable-next-line no-unused-vars
 async function sincronizarResultados(setResultados, setTodosPronosticos) {
@@ -504,7 +525,8 @@ function CardPartido({ p, resultados, misPronosticos, pronosticoLocal, setPronos
   const [guardando, setGuardando] = useState(false);
   const [editando, setEditando] = useState(false);
 
-  const puede = puedePronosticar(p.fecha);
+  const equiposDefinidos = p.local !== "Por definir" && p.visitante !== "Por definir";
+  const puede = puedePronosticar(p.fecha) && equiposDefinidos;
   const resultado = resultados[p.id];
   const proGuardado = misPronosticos[p.id];
   const proActual = pronosticoLocal[p.id] || { localGoles: "", visitanteGoles: "" };
@@ -623,6 +645,8 @@ function CardPartido({ p, resultados, misPronosticos, pronosticoLocal, setPronos
           <span className="text-gray-600">–</span>
           <span className="text-gray-300 font-black">{proGuardado.visitanteGoles}</span>
         </div>
+      ) : !equiposDefinidos ? (
+        <p className="text-center text-xs text-gray-500 italic">⏳ Equipos por definir — pronóstico disponible cuando se confirmen</p>
       ) : (
         <p className="text-center text-xs text-gray-600 italic">Partido cerrado — no ingresaste pronóstico</p>
       )}
@@ -700,7 +724,7 @@ function HoyView({ resultados, misPronosticos, onGuardar }) {
 }
 
 // ─── VISTA: PRONÓSTICOS POR GRUPO ─────────────────────────────────────────
-function PronosticosView({ resultados, misPronosticos, onGuardar }) {
+function PronosticosView({ resultados, misPronosticos, onGuardar, qfPartidos, sfPartidos, finPartidos }) {
   const [grupoActivo, setGrupoActivo] = useState("A");
   const [pronosticoLocal, setPronosticoLocal] = useState({});
   const [msg, setMsg] = useState("");
@@ -709,11 +733,21 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
 
   const esEliminatoria = grupoActivo === "R32";
   const esR16 = grupoActivo === "R16";
-  const partidosGrupo = esR16
-    ? PARTIDOS_R16
-    : esEliminatoria
-      ? PARTIDOS_ELIMINATORIA
-      : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const esQF = grupoActivo === "QF";
+  const esSF = grupoActivo === "SF";
+  const esFinales = grupoActivo === "3PL" || grupoActivo === "FIN";
+  const esFaseElim = esEliminatoria || esR16 || esQF || esSF || esFinales;
+
+  const partidosGrupo = esR16 ? PARTIDOS_R16
+    : esEliminatoria ? PARTIDOS_ELIMINATORIA
+    : esQF ? (qfPartidos || PARTIDOS_QF)
+    : esSF ? (sfPartidos || PARTIDOS_SF)
+    : esFinales ? (finPartidos || PARTIDOS_FINALES)
+    : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+
+  const labelFase = esR16 ? "Octavos de final" : esEliminatoria ? "Eliminatoria de 32"
+    : esQF ? "Cuartos de final" : esSF ? "Semifinales"
+    : grupoActivo === "3PL" ? "Tercer lugar" : grupoActivo === "FIN" ? "🏆 Gran Final" : "";
 
   async function guardar(pid, goles) {
     await onGuardar(pid, goles);
@@ -737,11 +771,27 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
           className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R16" ? "bg-orange-500 text-black" : "bg-white/5 text-orange-400 border border-orange-500/30"}`}>
           ⚽ Octavos
         </button>
+        <button onClick={() => setGrupoActivo("QF")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "QF" ? "bg-purple-500 text-white" : "bg-white/5 text-purple-400 border border-purple-500/30"}`}>
+          🔥 Cuartos
+        </button>
+        <button onClick={() => setGrupoActivo("SF")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "SF" ? "bg-pink-500 text-white" : "bg-white/5 text-pink-400 border border-pink-500/30"}`}>
+          ⚡ Semis
+        </button>
+        <button onClick={() => setGrupoActivo("3PL")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "3PL" ? "bg-amber-600 text-white" : "bg-white/5 text-amber-400 border border-amber-500/30"}`}>
+          🥉 3er lugar
+        </button>
+        <button onClick={() => setGrupoActivo("FIN")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "FIN" ? "bg-yellow-400 text-black" : "bg-white/5 text-yellow-300 border border-yellow-400/30"}`}>
+          🏆 Final
+        </button>
       </div>
       {msg && <div className="mx-1 mt-2 bg-green-500/20 border border-green-500/40 text-green-400 text-sm text-center py-2 rounded-xl">{msg}</div>}
-      {(esEliminatoria || esR16) ? (
+      {esFaseElim ? (
         <div className="mx-1 mt-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-3 mb-3">
-          <p className="text-xs text-yellow-400 font-semibold">⚠️ {esR16 ? "Octavos de final" : "Eliminatoria de 32"}</p>
+          <p className="text-xs text-yellow-400 font-semibold">⚠️ {labelFase}</p>
           <p className="text-gray-400 text-xs mt-1">El resultado válido es 90 min + alargue (si lo hay). Los penales no cuentan para el pronóstico.</p>
         </div>
       ) : (
@@ -755,7 +805,7 @@ function PronosticosView({ resultados, misPronosticos, onGuardar }) {
       <div className="space-y-3 px-1">
         {partidosGrupo.map(p => (
           <CardPartido key={p.id} p={p} resultados={resultados} misPronosticos={misPronosticos}
-            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} showGrupo={esEliminatoria || esR16} />
+            pronosticoLocal={pronosticoLocal} setPronosticoLocal={setPronosticoLocal} onGuardar={guardar} showGrupo={esFaseElim} />
         ))}
       </div>
     </div>
@@ -806,14 +856,19 @@ function TablaView({ todos }) {
 }
 
 // ─── VISTA: ADMIN ─────────────────────────────────────────────────────────
-function AdminView({ resultados, onGuardarResultado }) {
+function AdminView({ resultados, onGuardarResultado, qfPartidos, sfPartidos, finPartidos }) {
   const [grupoActivo, setGrupoActivo] = useState("A");
   const [inputs, setInputs] = useState({});
   const [guardando, setGuardando] = useState(null);
   const [editandoAdmin, setEditandoAdmin] = useState({});
   const [msg, setMsg] = useState("");
 
-  const partidosGrupo = grupoActivo === "R16" ? PARTIDOS_R16 : grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
+  const partidosGrupo = grupoActivo === "R16" ? PARTIDOS_R16
+    : grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA
+    : grupoActivo === "QF" ? (qfPartidos || PARTIDOS_QF)
+    : grupoActivo === "SF" ? (sfPartidos || PARTIDOS_SF)
+    : (grupoActivo === "3PL" || grupoActivo === "FIN") ? (finPartidos || PARTIDOS_FINALES)
+    : PARTIDOS_BASE.filter(p => p.grupo === grupoActivo);
 
   async function guardar(partido) {
     const inp = inputs[partido.id];
@@ -846,6 +901,22 @@ function AdminView({ resultados, onGuardarResultado }) {
         <button onClick={() => setGrupoActivo("R16")}
           className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "R16" ? "bg-orange-500 text-black" : "bg-white/5 text-orange-400 border border-orange-500/30"}`}>
           ⚽ Octavos
+        </button>
+        <button onClick={() => setGrupoActivo("QF")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "QF" ? "bg-purple-500 text-white" : "bg-white/5 text-purple-400 border border-purple-500/30"}`}>
+          🔥 Cuartos
+        </button>
+        <button onClick={() => setGrupoActivo("SF")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "SF" ? "bg-pink-500 text-white" : "bg-white/5 text-pink-400 border border-pink-500/30"}`}>
+          ⚡ Semis
+        </button>
+        <button onClick={() => setGrupoActivo("3PL")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "3PL" ? "bg-amber-600 text-white" : "bg-white/5 text-amber-400 border border-amber-500/30"}`}>
+          🥉 3er lugar
+        </button>
+        <button onClick={() => setGrupoActivo("FIN")}
+          className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${grupoActivo === "FIN" ? "bg-yellow-400 text-black" : "bg-white/5 text-yellow-300 border border-yellow-400/30"}`}>
+          🏆 Final
         </button>
       </div>
       <div className="space-y-3 px-1 mt-3">
@@ -966,6 +1037,7 @@ export default function App() {
   const [resultados, setResultados] = useState({});
   const [todosPronosticos, setTodosPronosticos] = useState({});
   const [misPronosticos, setMisPronosticos] = useState({});
+  const [bracket, setBracket] = useState({});
   // eslint-disable-next-line no-unused-vars
   const [ultimaSync, setUltimaSync] = useState(null);
 
@@ -975,6 +1047,8 @@ export default function App() {
       setResultados(res);
       const ranking = await fbGet("global", "ranking") || {};
       setTodosPronosticos(ranking);
+      const br = await fbGet("global", "bracket") || {};
+      setBracket(br);
       setLoading(false);
       // Limpieza de NaN y duplicados (se ejecuta una vez al cargar)
       await limpiarNaNyDuplicados();
@@ -1015,7 +1089,27 @@ export default function App() {
     setTodosPronosticos({ ...ranking });
   }, [usuario]);
 
-  async function guardarPronostico(partidoId, goles) {
+  // Aplica el bracket dinámico a los partidos de fases eliminatorias
+  function aplicarBracket(partidos) {
+    return partidos.map(p => {
+      const br = bracket[p.id];
+      if (!br) return p;
+      return {
+        ...p,
+        local: br.local || p.local,
+        visitante: br.visitante || p.visitante,
+      };
+    });
+  }
+
+  const qfConBracket = aplicarBracket(PARTIDOS_QF);
+  const sfConBracket = aplicarBracket(PARTIDOS_SF);
+  const finalesConBracket = aplicarBracket(PARTIDOS_FINALES);
+
+  // Verifica si un partido tiene ambos equipos definidos (no "Por definir")
+  function partidoDefinido(p) {
+    return p.local !== "Por definir" && p.visitante !== "Por definir";
+  }
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
     const emailKey = emailToKey(usuario.email);
@@ -1023,11 +1117,86 @@ export default function App() {
     await recalcularTodos(nuevos, usuario.email);
   }
 
+// ─── LÓGICA DE BRACKET ───────────────────────────────────────────────────
+// Define qué partido sigue y qué posición (local/visitante) ocupa el ganador
+const BRACKET = {
+  // Octavos → Cuartos
+  "R16_1": { siguiente: "QF1", posicion: "local" },      // Canadá-Marruecos → QF1 local
+  "R16_2": { siguiente: "QF1", posicion: "visitante" },   // Paraguay-Francia → QF1 visitante (→ Francia ganó)
+  "R16_3": { siguiente: "QF2", posicion: "local" },       // Brasil-Noruega → QF2 local
+  "R16_4": { siguiente: "QF2", posicion: "visitante" },   // México-Inglaterra → QF2 visitante
+  "R16_5": { siguiente: "QF3", posicion: "local" },       // Portugal-España → QF3 local
+  "R16_6": { siguiente: "QF3", posicion: "visitante" },   // EEUU-Bélgica → QF3 visitante
+  "R16_7": { siguiente: "QF4", posicion: "local" },       // Argentina-Egipto → QF4 local
+  "R16_8": { siguiente: "QF4", posicion: "visitante" },   // Suiza-Colombia → QF4 visitante
+  // Cuartos → Semis
+  "QF1": { siguiente: "SF1", posicion: "local" },         // QF1 ganador → SF1 local
+  "QF2": { siguiente: "SF1", posicion: "visitante" },     // QF2 ganador → SF1 visitante
+  "QF3": { siguiente: "SF2", posicion: "local" },         // QF3 ganador → SF2 local
+  "QF4": { siguiente: "SF2", posicion: "visitante" },     // QF4 ganador → SF2 visitante
+  // Semis → Final y 3er lugar
+  "SF1": { siguiente: "FIN", posicion: "local",    perdedor: { siguiente: "3PL", posicion: "local" } },
+  "SF2": { siguiente: "FIN", posicion: "visitante", perdedor: { siguiente: "3PL", posicion: "visitante" } },
+};
+
+function obtenerGanador(partido, goles) {
+  const { localGoles, visitanteGoles } = goles;
+  if (localGoles > visitanteGoles) return partido.local;
+  if (visitanteGoles > localGoles) return partido.visitante;
+  return null; // empate en tiempo normal (no debería pasar en eliminatoria, pero por si acaso)
+}
+
+function obtenerPerdedor(partido, goles) {
+  const { localGoles, visitanteGoles } = goles;
+  if (localGoles > visitanteGoles) return partido.visitante;
+  if (visitanteGoles > localGoles) return partido.local;
+  return null;
+}
+
+async function actualizarBracket(partidoId, goles, bracketActual) {
+  const regla = BRACKET[partidoId];
+  if (!regla) return bracketActual;
+
+  // Buscar el partido actual — primero en bracket dinámico, luego en base
+  const partidoBase = TODOS_LOS_PARTIDOS.find(p => p.id === partidoId);
+  if (!partidoBase) return bracketActual;
+
+  // Aplicar bracket al partido base para obtener los equipos reales
+  const br = bracketActual[partidoId] || {};
+  const partido = {
+    ...partidoBase,
+    local: br.local || partidoBase.local,
+    visitante: br.visitante || partidoBase.visitante,
+  };
+
+  const ganador = obtenerGanador(partido, goles);
+  if (!ganador) return bracketActual;
+
+  const nuevoBracket = { ...bracketActual };
+  if (!nuevoBracket[regla.siguiente]) nuevoBracket[regla.siguiente] = {};
+  nuevoBracket[regla.siguiente][regla.posicion] = ganador;
+
+  // Si hay perdedor (semis → 3er lugar)
+  if (regla.perdedor) {
+    const perdedor = obtenerPerdedor(partido, goles);
+    if (perdedor) {
+      if (!nuevoBracket[regla.perdedor.siguiente]) nuevoBracket[regla.perdedor.siguiente] = {};
+      nuevoBracket[regla.perdedor.siguiente][regla.perdedor.posicion] = perdedor;
+    }
+  }
+
+  await fbSet("global", "bracket", nuevoBracket);
+  return nuevoBracket;
+}
+
   async function guardarResultado(partidoId, goles) {
     const nuevosRes = { ...resultados, [partidoId]: goles };
     setResultados(nuevosRes);
     await fbSet("global", "resultados", nuevosRes);
     await recalcularTodosUsuarios(nuevosRes, setTodosPronosticos);
+    // Actualizar bracket automáticamente con el ganador
+    const nuevoBracket = await actualizarBracket(partidoId, goles, bracket);
+    setBracket(nuevoBracket);
   }
 
   if (loading) {
@@ -1070,9 +1239,11 @@ export default function App() {
       </header>
       <main className="flex-1 overflow-y-auto px-2 pt-4">
         {tab === "hoy" && <HoyView resultados={resultados} misPronosticos={misPronosticos} onGuardar={guardarPronostico} />}
-        {tab === "pronosticos" && <PronosticosView resultados={resultados} misPronosticos={misPronosticos} onGuardar={guardarPronostico} />}
+        {tab === "pronosticos" && <PronosticosView resultados={resultados} misPronosticos={misPronosticos} onGuardar={guardarPronostico}
+          qfPartidos={qfConBracket} sfPartidos={sfConBracket} finPartidos={finalesConBracket} />}
         {tab === "tabla" && <TablaView todos={todosPronosticos} />}
-        {tab === "admin" && isAdmin && <AdminView resultados={resultados} onGuardarResultado={guardarResultado} />}
+        {tab === "admin" && isAdmin && <AdminView resultados={resultados} onGuardarResultado={guardarResultado}
+          qfPartidos={qfConBracket} sfPartidos={sfConBracket} finPartidos={finalesConBracket} />}
       </main>
       <nav className="sticky bottom-0 flex border-t border-white/10 backdrop-blur"
         style={{ background: "rgba(10,22,40,0.95)" }}>
