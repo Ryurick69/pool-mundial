@@ -1091,6 +1091,7 @@ export default function App() {
 
   // Aplica el bracket dinámico a los partidos de fases eliminatorias
   function aplicarBracket(partidos) {
+    console.log("bracket actual:", JSON.stringify(bracket));
     return partidos.map(p => {
       const br = bracket[p.id];
       if (!br) return p;
