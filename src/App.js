@@ -1116,6 +1116,8 @@ export default function App() {
     const intervalo = setInterval(cargarBracket, 30000); // cada 30 segundos
     return () => clearInterval(intervalo);
   }, []);
+
+  async function guardarPronostico(partidoId, goles) {
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
     const emailKey = emailToKey(usuario.email);
