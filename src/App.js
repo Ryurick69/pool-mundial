@@ -1106,8 +1106,16 @@ export default function App() {
   const sfConBracket = aplicarBracket(PARTIDOS_SF);
   const finalesConBracket = aplicarBracket(PARTIDOS_FINALES);
 
-  // Verifica si un partido tiene ambos equipos definidos (no "Por definir")
-  async function guardarPronostico(partidoId, goles) {
+  // Recargar bracket desde Firebase periódicamente
+  useEffect(() => {
+    async function cargarBracket() {
+      const br = await fbGet("global", "bracket") || {};
+      setBracket(br);
+    }
+    cargarBracket();
+    const intervalo = setInterval(cargarBracket, 30000); // cada 30 segundos
+    return () => clearInterval(intervalo);
+  }, []);
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
     const emailKey = emailToKey(usuario.email);
