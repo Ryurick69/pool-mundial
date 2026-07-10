@@ -183,12 +183,12 @@ const PARTIDOS_QF = [
   { id: "QF1", grupo: "QF", local: "Francia",      visitante: "Marruecos",   fecha: "2026-07-09T20:00:00Z", sede: "Por confirmar" },
   { id: "QF2", grupo: "QF", local: "España",       visitante: "Bélgica",     fecha: "2026-07-10T19:00:00Z", sede: "Por confirmar" },
   { id: "QF3", grupo: "QF", local: "Noruega",      visitante: "Inglaterra",  fecha: "2026-07-11T21:00:00Z", sede: "Por confirmar" },
-  { id: "QF4", grupo: "QF", local: "Por definir",  visitante: "Por definir", fecha: "2026-07-12T01:00:00Z", sede: "Por confirmar" },
+  { id: "QF4", grupo: "QF", local: "Argentina",   visitante: "Suiza",        fecha: "2026-07-12T01:00:00Z", sede: "Por confirmar" },
 ];
 
 // ─── SEMIFINALES ──────────────────────────────────────────────────────────
 const PARTIDOS_SF = [
-  { id: "SF1", grupo: "SF", local: "Por definir", visitante: "Por definir", fecha: "2026-07-14T19:00:00Z", sede: "Por confirmar" },
+  { id: "SF1", grupo: "SF", local: "Francia",     visitante: "España",      fecha: "2026-07-14T19:00:00Z", sede: "Por confirmar" },
   { id: "SF2", grupo: "SF", local: "Por definir", visitante: "Por definir", fecha: "2026-07-15T19:00:00Z", sede: "Por confirmar" },
 ];
 
