@@ -977,6 +977,7 @@ function AdminView({ resultados, onGuardarResultado, qfPartidos, sfPartidos, fin
 }
 
 // ─── LIMPIEZA: NaN → 0, deduplicar emails y migrar claves antiguas ──────────
+// eslint-disable-next-line no-unused-vars
 async function limpiarNaNyDuplicados() {
   try {
     const usuarios = await fbGetAll("usuarios");
