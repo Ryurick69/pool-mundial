@@ -454,15 +454,23 @@ function LoginView({ onLogin }) {
       await fbSet("usuarios", emailKey, nuevoUsuario);
       onLogin(nuevoUsuario);
     } else {
-      // Buscar en ambos formatos de clave (compatibilidad hacia atrás)
-      const emailKey1 = email.toLowerCase().replace(/\./g, "_"); // formato original: saldivar_nunez@gmail_com
-      const emailKey2 = email.toLowerCase().replace(/@/g, "_AT_").replace(/\./g, "_"); // formato nuevo: saldivar_nunez_AT_gmail_com
+      // Buscar en todos los formatos posibles de clave
+      const emailLower = email.toLowerCase();
+      const emailKey1 = emailLower.replace(/\./g, "_"); // saldivar_nunez@gmail_com
+      const emailKey2 = emailLower.replace(/@/g, "_AT_").replace(/\./g, "_"); // saldivar_nunez_AT_gmail_com
+      const emailKey3 = emailLower.replace(/[@.]/g, "_"); // saldivar_nunez_gmail_com (sin @ ni puntos)
+
+      console.log("Buscando con claves:", emailKey1, emailKey2, emailKey3);
+
       let u = await fbGet("usuarios", emailKey1);
       let usedKey = emailKey1;
       if (!u) { u = await fbGet("usuarios", emailKey2); usedKey = emailKey2; }
+      if (!u) { u = await fbGet("usuarios", emailKey3); usedKey = emailKey3; }
+
+      console.log("Usuario encontrado:", u, "con key:", usedKey);
+
       if (!u) { setError("No existe cuenta con ese email"); setLoading(false); return; }
       if (u.pass !== pass) { setError("Contraseña incorrecta"); setLoading(false); return; }
-      // Guardar qué key usó para que los pronósticos se lean del lugar correcto
       onLogin({ ...u, _key: usedKey });
     }
     setLoading(false);
