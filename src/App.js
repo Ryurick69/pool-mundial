@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 // ─── FIREBASE CONFIG ──────────────────────────────────────────────────────
 const firebaseConfig = {
@@ -27,7 +27,17 @@ async function fbSet(coleccion, id, data) {
     return true;
   } catch { return false; }
 }
-async function fbGetAll(coleccion) {
+async function fbGetByEmail(email) {
+  try {
+    const q = query(collection(db, "usuarios"), where("email", "==", email.toLowerCase()));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const docSnap = snap.docs[0];
+      return { data: docSnap.data(), id: docSnap.id };
+    }
+    return null;
+  } catch(e) { console.warn("fbGetByEmail error:", e); return null; }
+}
   try {
     const snap = await getDocs(collection(db, coleccion));
     const result = {};
@@ -454,22 +464,15 @@ function LoginView({ onLogin }) {
       await fbSet("usuarios", emailKey, nuevoUsuario);
       onLogin(nuevoUsuario);
     } else {
-      // Buscar en todos los formatos posibles de clave
       const emailLower = email.toLowerCase();
-      const emailKey1 = emailLower.replace(/\./g, "_"); // saldivar_nunez@gmail_com
-      const emailKey2 = emailLower.replace(/@/g, "_AT_").replace(/\./g, "_"); // saldivar_nunez_AT_gmail_com
-      const emailKey3 = emailLower.replace(/[@.]/g, "_"); // saldivar_nunez_gmail_com (sin @ ni puntos)
 
-      console.log("Buscando con claves:", emailKey1, emailKey2, emailKey3);
+      // Buscar por campo email directamente (evita problemas con @ en el ID del documento)
+      const resultado = await fbGetByEmail(emailLower);
+      console.log("Resultado búsqueda por email:", resultado);
 
-      let u = await fbGet("usuarios", emailKey1);
-      let usedKey = emailKey1;
-      if (!u) { u = await fbGet("usuarios", emailKey2); usedKey = emailKey2; }
-      if (!u) { u = await fbGet("usuarios", emailKey3); usedKey = emailKey3; }
-
-      console.log("Usuario encontrado:", u, "con key:", usedKey);
-
-      if (!u) { setError("No existe cuenta con ese email"); setLoading(false); return; }
+      if (!resultado) { setError("No existe cuenta con ese email"); setLoading(false); return; }
+      const u = resultado.data;
+      const usedKey = resultado.id;
       if (u.pass !== pass) { setError("Contraseña incorrecta"); setLoading(false); return; }
       onLogin({ ...u, _key: usedKey });
     }
