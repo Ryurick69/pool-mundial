@@ -38,6 +38,7 @@ async function fbGetByEmail(email) {
     return null;
   } catch(e) { console.warn("fbGetByEmail error:", e); return null; }
 }
+async function fbGetAll(coleccion) {
   try {
     const snap = await getDocs(collection(db, coleccion));
     const result = {};
