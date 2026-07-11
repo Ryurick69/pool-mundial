@@ -454,11 +454,16 @@ function LoginView({ onLogin }) {
       await fbSet("usuarios", emailKey, nuevoUsuario);
       onLogin(nuevoUsuario);
     } else {
-      const emailKey = emailToKey(email);
-      const u = await fbGet("usuarios", emailKey);
+      // Buscar en ambos formatos de clave (compatibilidad hacia atrás)
+      const emailKey1 = email.toLowerCase().replace(/\./g, "_"); // formato original: saldivar_nunez@gmail_com
+      const emailKey2 = email.toLowerCase().replace(/@/g, "_AT_").replace(/\./g, "_"); // formato nuevo: saldivar_nunez_AT_gmail_com
+      let u = await fbGet("usuarios", emailKey1);
+      let usedKey = emailKey1;
+      if (!u) { u = await fbGet("usuarios", emailKey2); usedKey = emailKey2; }
       if (!u) { setError("No existe cuenta con ese email"); setLoading(false); return; }
       if (u.pass !== pass) { setError("Contraseña incorrecta"); setLoading(false); return; }
-      onLogin(u);
+      // Guardar qué key usó para que los pronósticos se lean del lugar correcto
+      onLogin({ ...u, _key: usedKey });
     }
     setLoading(false);
   }
@@ -1049,8 +1054,8 @@ export default function App() {
       const br = await fbGet("global", "bracket") || {};
       setBracket(br);
       setLoading(false);
-      // Limpieza de NaN y duplicados (se ejecuta una vez al cargar)
-      await limpiarNaNyDuplicados();
+      // limpiarNaNyDuplicados deshabilitado — causaba conflictos entre formatos de clave
+      // await limpiarNaNyDuplicados();
       // SYNC AUTOMÁTICO DESACTIVADO — los resultados se ingresan manualmente desde el panel Admin.
       // sincronizarResultados(setResultados, setTodosPronosticos).then(() => setUltimaSync(new Date()));
     }
@@ -1065,7 +1070,8 @@ export default function App() {
   useEffect(() => {
     if (!usuario) return;
     async function cargarMis() {
-      const emailKey = emailToKey(usuario.email);
+      // Usar la key exacta con que se encontró el usuario en Firestore
+      const emailKey = usuario._key || emailToKey(usuario.email);
       const mis = await fbGet("pronosticos", emailKey) || {};
       setMisPronosticos(mis);
     }
@@ -1120,7 +1126,7 @@ export default function App() {
   async function guardarPronostico(partidoId, goles) {
     const nuevos = { ...misPronosticos, [partidoId]: goles };
     setMisPronosticos(nuevos);
-    const emailKey = emailToKey(usuario.email);
+    const emailKey = usuario._key || emailToKey(usuario.email);
     await fbSet("pronosticos", emailKey, nuevos);
     await recalcularTodos(nuevos, usuario.email);
   }
