@@ -355,11 +355,10 @@ async function sincronizarResultados(setResultados, setTodosPronosticos) {
   }
 }
 
-// Convierte email a clave Firestore reemplazando SOLO los puntos del usuario (no del dominio)
-// ej: Saldivar.nunez@gmail.com → saldivar_nunez@gmail_com (Firestore no permite puntos ni @)
-// Usamos una clave que sea consistente: todo minúsculas, @ → _AT_, . → _
+// Convierte email a clave Firestore — formato original que usan todos los usuarios registrados
+// Ejemplo: saldivar.nunez@gmail.com → saldivar_nunez@gmail_com
 function emailToKey(email) {
-  return email.toLowerCase().replace(/@/g, "_AT_").replace(/\./g, "_");
+  return email.toLowerCase().replace(/\./g, "_");
 }
 
 async function recalcularTodosUsuarios(resultadosActuales, setTodosPronosticos) {
