@@ -878,12 +878,13 @@ function TablaView({ todos }) {
 }
 
 // ─── VISTA: ADMIN ─────────────────────────────────────────────────────────
-function AdminView({ resultados, onGuardarResultado, qfPartidos, sfPartidos, finPartidos }) {
+function AdminView({ resultados, onGuardarResultado, onRecalcular, qfPartidos, sfPartidos, finPartidos }) {
   const [grupoActivo, setGrupoActivo] = useState("A");
   const [inputs, setInputs] = useState({});
   const [guardando, setGuardando] = useState(null);
   const [editandoAdmin, setEditandoAdmin] = useState({});
   const [msg, setMsg] = useState("");
+  const [recalculando, setRecalculando] = useState(false);
 
   const partidosGrupo = grupoActivo === "R16" ? PARTIDOS_R16
     : grupoActivo === "R32" ? PARTIDOS_ELIMINATORIA
@@ -907,6 +908,17 @@ function AdminView({ resultados, onGuardarResultado, qfPartidos, sfPartidos, fin
       <div className="mx-1 mb-4 bg-red-500/10 border border-red-500/20 rounded-xl p-3">
         <p className="text-red-400 text-xs font-semibold">⚙️ Panel de administración — solo visible para ti</p>
         <p className="text-gray-500 text-xs mt-1">Ingresa los resultados reales de cada partido aquí. En octavos, ingresa el resultado de 90 min + alargue (sin penales).</p>
+        <button
+          onClick={async () => {
+            setRecalculando(true);
+            await onRecalcular();
+            setMsg("✓ Puntajes recalculados"); setTimeout(() => setMsg(""), 3000);
+            setRecalculando(false);
+          }}
+          disabled={recalculando}
+          className="mt-3 w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-2 rounded-xl text-xs transition-all">
+          {recalculando ? "Recalculando..." : "🔄 Recalcular todos los puntajes"}
+        </button>
       </div>
       {msg && <div className="mx-1 mb-3 bg-green-500/20 border border-green-500/40 text-green-400 text-sm text-center py-2 rounded-xl">{msg}</div>}
       <div className="flex gap-1 overflow-x-auto pb-2 px-1">
@@ -1234,7 +1246,10 @@ async function actualizarBracket(partidoId, goles, bracketActual) {
   return nuevoBracket;
 }
 
-  async function guardarResultado(partidoId, goles) {
+  async function recalcularTodo() {
+    const res = await fbGet("global", "resultados") || {};
+    await recalcularTodosUsuarios(res, setTodosPronosticos);
+  }
     const nuevosRes = { ...resultados, [partidoId]: goles };
     setResultados(nuevosRes);
     await fbSet("global", "resultados", nuevosRes);
@@ -1287,7 +1302,7 @@ async function actualizarBracket(partidoId, goles, bracketActual) {
         {tab === "pronosticos" && <PronosticosView resultados={resultados} misPronosticos={misPronosticos} onGuardar={guardarPronostico}
           qfPartidos={qfConBracket} sfPartidos={sfConBracket} finPartidos={finalesConBracket} />}
         {tab === "tabla" && <TablaView todos={todosPronosticos} />}
-        {tab === "admin" && isAdmin && <AdminView resultados={resultados} onGuardarResultado={guardarResultado}
+        {tab === "admin" && isAdmin && <AdminView resultados={resultados} onGuardarResultado={guardarResultado} onRecalcular={recalcularTodo}
           qfPartidos={qfConBracket} sfPartidos={sfConBracket} finPartidos={finalesConBracket} />}
       </main>
       <nav className="sticky bottom-0 flex border-t border-white/10 backdrop-blur"
