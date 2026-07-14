@@ -1250,11 +1250,12 @@ async function actualizarBracket(partidoId, goles, bracketActual) {
     const res = await fbGet("global", "resultados") || {};
     await recalcularTodosUsuarios(res, setTodosPronosticos);
   }
+
+  async function guardarResultado(partidoId, goles) {
     const nuevosRes = { ...resultados, [partidoId]: goles };
     setResultados(nuevosRes);
     await fbSet("global", "resultados", nuevosRes);
     await recalcularTodosUsuarios(nuevosRes, setTodosPronosticos);
-    // Actualizar bracket automáticamente con el ganador
     const nuevoBracket = await actualizarBracket(partidoId, goles, bracket);
     setBracket(nuevoBracket);
   }
