@@ -200,7 +200,7 @@ const PARTIDOS_QF = [
 // ─── SEMIFINALES ──────────────────────────────────────────────────────────
 const PARTIDOS_SF = [
   { id: "SF1", grupo: "SF", local: "Francia",     visitante: "España",      fecha: "2026-07-14T19:00:00Z", sede: "Por confirmar" },
-  { id: "SF2", grupo: "SF", local: "Por definir", visitante: "Por definir", fecha: "2026-07-15T19:00:00Z", sede: "Por confirmar" },
+  { id: "SF2", grupo: "SF", local: "Inglaterra",  visitante: "Argentina",   fecha: "2026-07-15T19:00:00Z", sede: "Por confirmar" },
 ];
 
 // ─── TERCER LUGAR Y FINAL ─────────────────────────────────────────────────
@@ -382,8 +382,14 @@ async function recalcularTodosUsuarios(resultadosActuales, setTodosPronosticos) 
     if (emailsVistos.has(emailLower)) continue;
     emailsVistos.add(emailLower);
 
-    const key = emailToKey(emailLower);
-    const sus = await fbGet("pronosticos", key) || {};
+    // Leer pronósticos de AMBAS claves posibles y fusionarlos
+    const key1 = emailLower.replace(/\./g, "_"); // formato original: saldivar_nunez@gmail_com
+    const key2 = emailLower.replace(/@/g, "_AT_").replace(/\./g, "_"); // formato nuevo: _AT_
+    const sus1 = await fbGet("pronosticos", key1) || {};
+    const sus2 = await fbGet("pronosticos", key2) || {};
+    // Fusionar: key2 tiene prioridad si existe el mismo partido en ambos
+    const sus = { ...sus1, ...sus2 };
+
     let total = 0, exactos = 0;
     for (const [pid, pro] of Object.entries(sus)) {
       if (resultadosActuales[pid]) {
@@ -1083,10 +1089,13 @@ export default function App() {
   useEffect(() => {
     if (!usuario) return;
     async function cargarMis() {
-      // Usar la key exacta con que se encontró el usuario en Firestore
-      const emailKey = usuario._key || emailToKey(usuario.email);
-      const mis = await fbGet("pronosticos", emailKey) || {};
-      setMisPronosticos(mis);
+      const emailLower = usuario.email.toLowerCase();
+      const key1 = emailLower.replace(/\./g, "_");
+      const key2 = emailLower.replace(/@/g, "_AT_").replace(/\./g, "_");
+      const sus1 = await fbGet("pronosticos", key1) || {};
+      const sus2 = await fbGet("pronosticos", key2) || {};
+      // Fusionar ambos, key2 tiene prioridad (más reciente)
+      setMisPronosticos({ ...sus1, ...sus2 });
     }
     cargarMis();
   }, [usuario]);
@@ -1094,15 +1103,24 @@ export default function App() {
   const recalcularTodos = useCallback(async (nuevosMis, email) => {
     const res = await fbGet("global", "resultados") || {};
     const ranking = await fbGet("global", "ranking") || {};
+    const emailLower = email.toLowerCase();
+
+    // Fusionar pronósticos de ambas claves posibles
+    const key1 = emailLower.replace(/\./g, "_");
+    const key2 = emailLower.replace(/@/g, "_AT_").replace(/\./g, "_");
+    const sus1 = await fbGet("pronosticos", key1) || {};
+    const sus2 = await fbGet("pronosticos", key2) || {};
+    const todosSus = { ...sus1, ...sus2, ...nuevosMis }; // nuevosMis tiene prioridad
+
     let total = 0, exactos = 0;
-    for (const [pid, pro] of Object.entries(nuevosMis)) {
+    for (const [pid, pro] of Object.entries(todosSus)) {
       if (res[pid]) {
         const pts = calcularPuntos(pro, res[pid]);
         total += pts;
         if (pts === 2) exactos++;
       }
     }
-    ranking[email.toLowerCase()] = { nombre: usuario.nombre, total, exactos };
+    ranking[emailLower] = { nombre: usuario.nombre, total, exactos };
     await fbSet("global", "ranking", ranking);
     setTodosPronosticos({ ...ranking });
   }, [usuario]);
