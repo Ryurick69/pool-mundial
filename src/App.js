@@ -205,8 +205,8 @@ const PARTIDOS_SF = [
 
 // ─── TERCER LUGAR Y FINAL ─────────────────────────────────────────────────
 const PARTIDOS_FINALES = [
-  { id: "3PL", grupo: "3PL", local: "Por definir", visitante: "Por definir", fecha: "2026-07-18T21:00:00Z", sede: "Por confirmar" },
-  { id: "FIN", grupo: "FIN", local: "Por definir", visitante: "Por definir", fecha: "2026-07-19T19:00:00Z", sede: "Por confirmar" },
+  { id: "3PL", grupo: "3PL", local: "Francia",  visitante: "Inglaterra", fecha: "2026-07-18T21:00:00Z", sede: "Por confirmar" },
+  { id: "FIN", grupo: "FIN", local: "España",   visitante: "Argentina",  fecha: "2026-07-19T19:00:00Z", sede: "Por confirmar" },
 ];
 
 // Lista combinada de todos los partidos para búsquedas, vista Hoy y sincronización
